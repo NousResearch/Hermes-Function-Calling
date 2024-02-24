@@ -1,7 +1,7 @@
 # Hermes-Function-Calling
 
 ## Install requied packages
-pip install -r requirements.txt
+`pip install -r requirements.txt`
 
 ## Run function call inference with query
 `python functioncall.py --model_path NousResearch/Qwen1.5-0.5b-hermes-func-calling --chat_template chatml --query "I need the current stock price of Tesla (TSLA)"`

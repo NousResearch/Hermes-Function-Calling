@@ -1,8 +1,28 @@
-from typing import List
 import pandas as pd
 import yfinance as yf
+from typing import List
 from langchain.tools import tool
-from langchain.tools.render import format_tool_to_openai_tool
+from langchain_core.utils.function_calling import convert_to_openai_tool
+
+@tool
+def get_current_stock_price(symbol: str) -> float:
+  """
+  Get the current stock price for a given symbol.
+
+  Args:
+    symbol (str): The stock symbol.
+
+  Returns:
+    float: The current stock price, or None if an error occurs.
+  """
+  try:
+    stock = yf.Ticker(symbol)
+    # Use "regularMarketPrice" for regular market hours, or "currentPrice" for pre/post market
+    current_price = stock.info.get("regularMarketPrice", stock.info.get("currentPrice"))
+    return current_price if current_price else None
+  except Exception as e:
+    print(f"Error fetching current price for {symbol}: {e}")
+    return None
 
 @tool
 def get_stock_fundamentals(symbol: str) -> dict:
@@ -152,39 +172,6 @@ def get_company_news(symbol: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 @tool
-def get_option_chain(symbol: str) -> pd.DataFrame:
-    """
-    Get option chain data for a given stock symbol.
-
-    Args:
-    symbol (str): The stock symbol.
-
-    Returns:
-    pd.DataFrame: DataFrame containing option chain data.
-    """
-    try:
-        option_chain = yf.Ticker(symbol).option_chain
-        return option_chain
-    except Exception as e:
-        print(f"Error fetching option chain data for {symbol}: {e}")
-        return pd.DataFrame()
-
-@tool
-def get_market_indices() -> pd.DataFrame:
-    """
-    Get data for major market indices.
-
-    Returns:
-    pd.DataFrame: DataFrame containing data for major market indices.
-    """
-    try:
-        indices = yf.download('^GSPC ^DJI ^IXIC', start="2000-01-01", end="2023-01-01")
-        return indices
-    except Exception as e:
-        print(f"Error fetching market indices data: {e}")
-        return pd.DataFrame()
-
-@tool
 def get_technical_indicators(symbol: str) -> pd.DataFrame:
     """
     Get technical indicators for a given stock symbol.
@@ -219,9 +206,29 @@ def get_company_profile(symbol: str) -> dict:
     except Exception as e:
         print(f"Error fetching company profile for {symbol}: {e}")
         return {}
+    
+@tool
+def execute_code(code_string):
+    """
+    Execute the provided Python code string using exec.
+
+    Parameters:
+    - code_string (str): The Python code to be executed.
+
+    Returns:
+    None
+
+    Note:
+    Use this function with caution, as executing arbitrary code can pose security risks.
+    """
+    try:
+        exec(code_string)
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 def get_openai_tools() -> List[dict]:
     functions = [
+        get_current_stock_price,
         get_company_news,
         get_company_profile,
         get_stock_fundamentals,
@@ -230,10 +237,9 @@ def get_openai_tools() -> List[dict]:
         get_analyst_recommendations,
         get_dividend_data,
         get_historical_price_data,
-        get_market_indices,
         get_technical_indicators,
-        get_option_chain
+        execute_code
     ]
 
-    tools = [format_tool_to_openai_tool(f) for f in functions]
+    tools = [convert_to_openai_tool(f) for f in functions]
     return tools

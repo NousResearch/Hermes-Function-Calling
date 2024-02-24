@@ -1,4 +1,3 @@
-import json
 from pydantic import ValidationError
 from utils import eval_logger
 from schema import FunctionCall, FunctionSignature

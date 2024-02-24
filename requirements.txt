@@ -1,0 +1,5 @@
+torch==2.1.2
+langchain==0.1.9
+pydantic==2.6.2
+yfinance==0.2.36
+pandas==2.2.0

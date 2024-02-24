@@ -4,9 +4,9 @@
 pip install -r requirements.txt
 
 ## Run function call inference with query
-python functioncall.py --model_path NousResearch/Qwen1.5-0.5b-hermes-func-calling --chat_template chatml --query "I need the current stock price of Tesla (TSLA)"
+`python functioncall.py --model_path NousResearch/Qwen1.5-0.5b-hermes-func-calling --chat_template chatml --query "I need the current stock price of Tesla (TSLA)"`
 
-result:
+```
 <|im_start|>user
 Fetch the fundamentals data for Tesla (TSLA) stock<|im_end|>
 <|im_start|>assistant
@@ -24,3 +24,4 @@ Fetch the fundamentals data for Tesla (TSLA) stock<|im_end|>
   }
 ]
 191.97
+```

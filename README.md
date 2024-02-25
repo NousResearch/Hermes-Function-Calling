@@ -13,7 +13,7 @@
 --load_in_4bit: Option to load in 4bit with bitsandbytes (default: "False").
 --query: Query to be used for function call inference (default: "I need the current stock price of Tesla (TSLA)").
 
-## Inference exmple
+## Inference exmple output
 ```
 <|im_start|>user
 Fetch the stock fundamentals data for Tesla (TSLA)<|im_end|>

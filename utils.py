@@ -14,10 +14,10 @@ logging.basicConfig(
 )
 script_dir = os.path.dirname(os.path.abspath(__file__))
 now = datetime.datetime.now()
-log_folder = os.path.join(script_dir, "eval_logs")
+log_folder = os.path.join(script_dir, "inference_logs")
 os.makedirs(log_folder, exist_ok=True)
 log_file_path = os.path.join(
-    log_folder, f"function-calling-eval_{now.strftime('%Y-%m-%d_%H-%M-%S')}.log"
+    log_folder, f"function-calling-inference_{now.strftime('%Y-%m-%d_%H-%M-%S')}.log"
 )
 # Use RotatingFileHandler from the logging.handlers module
 file_handler = RotatingFileHandler(log_file_path, maxBytes=0, backupCount=0)
@@ -26,8 +26,8 @@ file_handler.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s,%(msecs)03d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s", datefmt="%Y-%m-%d:%H:%M:%S")
 file_handler.setFormatter(formatter)
 
-eval_logger = logging.getLogger("function-calling-eval")
-eval_logger.addHandler(file_handler)
+inference_logger = logging.getLogger("function-calling-inference")
+inference_logger.addHandler(file_handler)
 
 def get_fewshot_examples(num_fewshot):
     """return a list of few shot examples"""
@@ -40,10 +40,11 @@ def get_fewshot_examples(num_fewshot):
 
 def get_chat_template(chat_template):
     """read chat template from jinja file"""
-    template_path = os.path.join(script_dir, 'templates', chat_template)
+    template_path = os.path.join(script_dir, 'chat_templates', f"{chat_template}.j2")
 
     if not os.path.exists(template_path):
-        eval_logger.error(f"Template file not found: {chat_template}")
+        print
+        inference_logger.error(f"Template file not found: {chat_template}")
         return None
     try:
         with open(template_path, 'r') as file:
@@ -70,7 +71,7 @@ def get_assistant_message(completion, chat_template, eos_token):
         return assistant_content.replace(eos_token, "")
     else:
         assistant_content = None
-        eval_logger.info("No match found for the assistant pattern")
+        inference_logger.info("No match found for the assistant pattern")
         return assistant_content
 
 def validate_and_extract_tool_calls(assistant_content):
@@ -93,17 +94,17 @@ def validate_and_extract_tool_calls(assistant_content):
                         # Fallback to ast.literal_eval if json.loads fails
                         json_data = ast.literal_eval(json_text)
                     except (SyntaxError, ValueError) as eval_err:
-                        eval_logger.error("JSON parsing failed with both json.loads and ast.literal_eval:")
-                        eval_logger.error("- JSON Decode Error: %s", json_err)
-                        eval_logger.error("- Fallback Syntax/Value Error: %s", eval_err)
-                        eval_logger.error("- Problematic JSON text: %s", json_text)
+                        inference_logger.error("JSON parsing failed with both json.loads and ast.literal_eval:")
+                        inference_logger.error("- JSON Decode Error: %s", json_err)
+                        inference_logger.error("- Fallback Syntax/Value Error: %s", eval_err)
+                        inference_logger.error("- Problematic JSON text: %s", json_text)
                         continue
 
                 tool_calls.append(json_data)
                 validation_result = True
 
         except ET.ParseError as err:
-            eval_logger.error("XML Parse Error: %s", err)
+            inference_logger.error("XML Parse Error: %s", err)
 
 
         # Return default values if no valid data is extracted
@@ -112,16 +113,16 @@ def validate_and_extract_tool_calls(assistant_content):
 def validate_tool_calls(generated_arguments, expected_arguments):
     for key, expected_value in expected_arguments.items():
         if generated_arguments.get(key) != expected_value:
-            eval_logger.info("Expected: %s", expected_value)
-            eval_logger.info("Got: %s", generated_arguments.get(key))
+            inference_logger.info("Expected: %s", expected_value)
+            inference_logger.info("Got: %s", generated_arguments.get(key))
             return "failed"
     return "passed"
 
 def calculate_pass_rate(eval_results):
     passed_count =sum(1 for sample in eval_results if sample["result"] == "passed")
-    eval_logger.info("Number of eval tests passed: %s", passed_count)
-    eval_logger.info("Number of eval tests failed: %s", len(eval_results) - passed_count)
+    inference_logger.info("Number of eval tests passed: %s", passed_count)
+    inference_logger.info("Number of eval tests failed: %s", len(eval_results) - passed_count)
 
     pass_rate = passed_count / len(eval_results)
-    eval_logger.info(f"fireworks-ai function-calling eval (pass@1): {pass_rate}")
+    inference_logger.info(f"fireworks-ai function-calling eval (pass@1): {pass_rate}")
     return pass_rate

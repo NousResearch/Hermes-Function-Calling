@@ -21,6 +21,10 @@ python functioncall.py --query "I need the current stock price of Tesla (TSLA)"`
 ```
 <|im_start|>user
 Fetch the stock fundamentals data for Tesla (TSLA)<|im_end|>
+<|im_start|>assistant
+<tool_call>
+{'arguments': {'symbol': 'TSLA'}, 'name': 'get_stock_fundamentals'}
+</tool_call><|im_end|>
 <|im_start|>tool
 <tool_response>
 {"name": "get_stock_fundamentals", "content": {'symbol': 'TSLA', 'company_name': 'Tesla, Inc.', 'sector': 'Consumer Cyclical', 'industry': 'Auto Manufacturers', 'market_cap': 611384164352, 'pe_ratio': 49.604652, 'pb_ratio': 9.762013, 'dividend_yield': None, 'eps': 4.3, 'beta': 2.427, '52_week_high': 299.29, '52_week_low': 152.37}}

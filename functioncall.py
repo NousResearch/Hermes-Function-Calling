@@ -52,9 +52,7 @@ class ModelInference:
         eval_logger.info(self.tokenizer.chat_template)
         eval_logger.info(self.tokenizer.special_tokens_map)
 
-    def process_completion_and_validate(self, tokens, chat_template, tools):
-        completion = self.tokenizer.decode(tokens[0], skip_special_tokens=False, clean_up_tokenization_space=True)
-        eval_logger.info(f"model completion with eval prompt:\n{completion}")
+    def process_completion_and_validate(self, completion, chat_template, tools):
 
         assistant_message = get_assistant_message(completion, chat_template, self.tokenizer.eos_token)
 
@@ -79,8 +77,30 @@ class ModelInference:
         function_name = tool_call.get("name")
         function_to_call = getattr(functions, function_name, None)
         function_args = tool_call.get("arguments", {})
+
         function_response = function_to_call(*function_args.values())
-        print(function_response)
+        results_dict = f'{{"name": "{function_name}", "content": {function_response}}}'
+        return results_dict
+    
+    def run_inference(self, prompt):
+        inputs = self.tokenizer.apply_chat_template(
+            prompt,
+            add_generation_prompt=True,
+            return_tensors='pt'
+        )
+
+        tokens = self.model.generate(
+            inputs.to(self.model.device),
+            max_new_tokens=1500,
+            temperature=0.8,
+            repetition_penalty=1.1,
+            do_sample=True,
+            eos_token_id=self.tokenizer.eos_token_id
+        )
+        completion = self.tokenizer.decode(tokens[0], skip_special_tokens=False, clean_up_tokenization_space=True)
+        eval_logger.info(f"model completion with eval prompt:\n{completion}")
+
+        return completion
 
     def generate_function_call(self, query, chat_template, num_fewshot):
         try:
@@ -90,27 +110,23 @@ class ModelInference:
             tools = functions.get_openai_tools()
             prompt = self.prompter.generate_prompt(chat, tools, num_fewshot)
 
-            inputs = self.tokenizer.apply_chat_template(
-                prompt,
-                add_generation_prompt=True,
-                return_tensors='pt'
-            )
-
-            tokens = self.model.generate(
-                inputs.to(self.model.device),
-                max_new_tokens=1500,
-                temperature=0.8,
-                repetition_penalty=1.1,
-                do_sample=True,
-                eos_token_id=self.tokenizer.eos_token_id
-            )
+            completion = self.run_inference(prompt)
 
             # Call the separate function for completion and validation
-            tool_calls = self.process_completion_and_validate(tokens, chat_template, tools)
+            tool_calls = self.process_completion_and_validate(completion, chat_template, tools)
 
+            tool_message = ""
             if tool_calls:
                 for tool_call in tool_calls:
-                    self.execute_function_call(tool_call)
+                    function_response = self.execute_function_call(tool_call)
+
+                    # concatenate multiple tool call results 
+                    tool_message += f"<tool_response>\n{function_response}\n</tool_response>\n"
+                    
+                    prompt.append({"role": "tool", "content": tool_message})
+
+                    tool_summary = self.run_inference(prompt)
+                    print(tool_summary)
 
         except Exception as e:
             # Log the exception or perform any specific actions
@@ -131,7 +147,7 @@ if __name__ == "__main__":
     if args.model_path:
         inference = ModelInference(args.model_path, args.chat_template, args.load_in_4bit)
     else:
-        model_path = 'NousResearch/Nous-Hermes-2-PlusPlus'
+        model_path = 'NousResearch/Nous-Hermes-2-PlusPlus-Mistral-7B'
         inference = ModelInference(model_path, args.chat_template, args.load_in_4bit)
         
     # Run the model evaluator

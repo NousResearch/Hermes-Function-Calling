@@ -1,16 +1,19 @@
 # Hermes-Function-Calling
 
 ## Install required packages
-`pip install -r requirements.txt`
+```bash
+pip install -r requirements.txt
+```
 
 ## Run function call inference with query
-`python functioncall.py --model_path NousResearch/Qwen1.5-0.5b-hermes-func-calling --chat_template chatml --query "I need the current stock price of Tesla (TSLA)"`
-
+```bash
+python functioncall.py --query "I need the current stock price of Tesla (TSLA)"`
+```
 ### Command line arguments:
 ```yaml
---model_path: Path to the model folder.
+--model_path: Path to the model folder (default: "NousResearch/Nous-Hermes-2-PlusPlus-Mistral-7B)".
 --chat_template: Chat template for prompt formatting (default: "chatml").
---num_fewshot: Option to subset eval dataset (default: None).
+--num_fewshot: Option to include few shot examples (default: None).
 --load_in_4bit: Option to load in 4bit with bitsandbytes (default: "False").
 --query: Query to be used for function call inference (default: "I need the current stock price of Tesla (TSLA)").
 ```

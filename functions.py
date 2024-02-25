@@ -30,10 +30,23 @@ def get_stock_fundamentals(symbol: str) -> dict:
     Get fundamental data for a given stock symbol using yfinance API.
 
     Args:
-    symbol (str): The stock symbol.
+        symbol (str): The stock symbol.
 
     Returns:
-    dict: A dictionary containing fundamental data.
+        dict: A dictionary containing fundamental data.
+            Keys:
+                - 'symbol': The stock symbol.
+                - 'company_name': The long name of the company.
+                - 'sector': The sector to which the company belongs.
+                - 'industry': The industry to which the company belongs.
+                - 'market_cap': The market capitalization of the company.
+                - 'pe_ratio': The forward price-to-earnings ratio.
+                - 'pb_ratio': The price-to-book ratio.
+                - 'dividend_yield': The dividend yield.
+                - 'eps': The trailing earnings per share.
+                - 'beta': The beta value of the stock.
+                - '52_week_high': The 52-week high price of the stock.
+                - '52_week_low': The 52-week low price of the stock.
     """
     try:
         stock = yf.Ticker(symbol)
@@ -56,6 +69,7 @@ def get_stock_fundamentals(symbol: str) -> dict:
     except Exception as e:
         print(f"Error getting fundamentals for {symbol}: {e}")
         return {}
+
 @tool
 def get_historical_price_data(symbol: str, start_date: str, end_date: str) -> pd.DataFrame:
     """

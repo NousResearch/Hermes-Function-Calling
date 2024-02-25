@@ -13,7 +13,7 @@ from prompter import PromptManager
 from validator import validate_function_call_schema
 
 from utils import (
-    eval_logger,
+    inference_logger,
     get_assistant_message,
     get_chat_template,
     validate_and_extract_tool_calls
@@ -45,12 +45,13 @@ class ModelInference:
         self.tokenizer.padding_side = "left"
 
         if self.tokenizer.chat_template is None:
+            print("No chat template defined, getting chat_template...")
             self.tokenizer.chat_template = get_chat_template(chat_template)
         
-        eval_logger.info(self.model.config)
-        eval_logger.info(self.model.generation_config)
-        eval_logger.info(self.tokenizer.chat_template)
-        eval_logger.info(self.tokenizer.special_tokens_map)
+        inference_logger.info(self.model.config)
+        inference_logger.info(self.model.generation_config)
+        inference_logger.info(self.tokenizer.chat_template)
+        inference_logger.info(self.tokenizer.special_tokens_map)
 
     def process_completion_and_validate(self, completion, chat_template, tools):
 
@@ -60,17 +61,17 @@ class ModelInference:
             validation, tool_calls = validate_and_extract_tool_calls(assistant_message)
 
             if validation and all(validate_function_call_schema(tool_call, tools) for tool_call in tool_calls):
-                eval_logger.info(f"all validations passed")
-                eval_logger.info(f"parsed tool calls:\n{json.dumps(tool_calls, indent=2)}")
+                inference_logger.info(f"all validations passed")
+                inference_logger.info(f"parsed tool calls:\n{json.dumps(tool_calls, indent=2)}")
                 return tool_calls, assistant_message
             else:
-                eval_logger.info("Validation failed for function calls")
-                eval_logger.info(f"Assistant message: {assistant_message}")
+                inference_logger.info("Validation failed for function calls")
+                inference_logger.info(f"Assistant message: {assistant_message}")
                 if validation is False and assistant_message is None:
-                    eval_logger.warning("Validation failed due to None assistant message")
+                    inference_logger.warning("Validation failed: assistant message is none")
                     raise ValueError("Validation failed for function calls")
         else:
-            eval_logger.warning("Assistant message is None")
+            inference_logger.warning("Assistant message is None")
             raise ValueError("Assistant message is None")
         
     def execute_function_call(self, tool_call):
@@ -78,6 +79,7 @@ class ModelInference:
         function_to_call = getattr(functions, function_name, None)
         function_args = tool_call.get("arguments", {})
 
+        inference_logger.info(f"Invoking function call {function_name} ...")
         function_response = function_to_call(*function_args.values())
         results_dict = f'{{"name": "{function_name}", "content": {function_response}}}'
         return results_dict
@@ -98,7 +100,7 @@ class ModelInference:
             eos_token_id=self.tokenizer.eos_token_id
         )
         completion = self.tokenizer.decode(tokens[0], skip_special_tokens=False, clean_up_tokenization_space=True)
-        eval_logger.info(f"model completion with eval prompt:\n{completion}")
+        inference_logger.info(f"model completion with prompt:\n{completion}")
 
         return completion
 
@@ -131,7 +133,7 @@ class ModelInference:
 
         except Exception as e:
             # Log the exception or perform any specific actions
-            eval_logger.error(f"Unhandled exception occurred: {e}")
+            inference_logger.error(f"Exception occurred: {e}")
             raise e 
         
 

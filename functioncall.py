@@ -62,7 +62,7 @@ class ModelInference:
             if validation and all(validate_function_call_schema(tool_call, tools) for tool_call in tool_calls):
                 eval_logger.info(f"all validations passed")
                 eval_logger.info(f"parsed tool calls:\n{json.dumps(tool_calls, indent=2)}")
-                return tool_calls
+                return tool_calls, assistant_message
             else:
                 eval_logger.info("Validation failed for function calls")
                 eval_logger.info(f"Assistant message: {assistant_message}")
@@ -113,7 +113,9 @@ class ModelInference:
             completion = self.run_inference(prompt)
 
             # Call the separate function for completion and validation
-            tool_calls = self.process_completion_and_validate(completion, chat_template, tools)
+            tool_calls, assistant_message = self.process_completion_and_validate(completion, chat_template, tools)
+
+            prompt.append({"role": "assistant", "content": assistant_message})
 
             tool_message = ""
             if tool_calls:
@@ -122,11 +124,10 @@ class ModelInference:
 
                     # concatenate multiple tool call results 
                     tool_message += f"<tool_response>\n{function_response}\n</tool_response>\n"
-                    
-                    prompt.append({"role": "tool", "content": tool_message})
-
-                    tool_summary = self.run_inference(prompt)
-                    print(tool_summary)
+                
+                prompt.append({"role": "tool", "content": tool_message})
+                tool_summary = self.run_inference(prompt)
+                print(tool_summary)
 
         except Exception as e:
             # Log the exception or perform any specific actions

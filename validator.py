@@ -1,12 +1,12 @@
 from pydantic import ValidationError
-from utils import eval_logger
+from utils import inference_logger
 from schema import FunctionCall, FunctionSignature
 
 def validate_function_call_schema(call, signatures):
     try:
         call_data = FunctionCall(**call)
     except ValidationError as e:
-        eval_logger.info(f"Invalid function call: {e}")
+        inference_logger.info(f"Invalid function call: {e}")
         return False
 
     for signature in signatures:
@@ -24,7 +24,7 @@ def validate_function_call_schema(call, signatures):
                             try:
                                 validate_argument_type(arg_name, call_arg_value, arg_schema)
                             except Exception as arg_validation_error:
-                                eval_logger.info(f"Invalid argument '{arg_name}': {arg_validation_error}")
+                                inference_logger.info(f"Invalid argument '{arg_name}': {arg_validation_error}")
                                 return False
 
                 # Check if all required arguments are present
@@ -32,17 +32,17 @@ def validate_function_call_schema(call, signatures):
                 result, missing_arguments = check_required_arguments(call_data.arguments, required_arguments)
 
                 if not result:
-                    eval_logger.info(f"Missing required arguments: {missing_arguments}")
+                    inference_logger.info(f"Missing required arguments: {missing_arguments}")
                     return False
 
                 return True
         except Exception as e:
             # Handle validation errors for the function signature
-            eval_logger.info(f"Error validating function call: {e}")
+            inference_logger.info(f"Error validating function call: {e}")
             return False
 
     # Moved the "No matching function signature found" message here
-    eval_logger.info(f"No matching function signature found for function: {call_data.name}")
+    inference_logger.info(f"No matching function signature found for function: {call_data.name}")
     return False
 
 def check_required_arguments(call_arguments, required_arguments):

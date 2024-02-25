@@ -8,20 +8,28 @@
 
 ```
 <|im_start|>user
-Fetch the fundamentals data for Tesla (TSLA) stock<|im_end|>
+Fetch the stock fundamentals data for Tesla (TSLA)<|im_end|>
+<|im_start|>tool
+<tool_response>
+{"name": "get_stock_fundamentals", "content": {'symbol': 'TSLA', 'company_name': 'Tesla, Inc.', 'sector': 'Consumer Cyclical', 'industry': 'Auto Manufacturers', 'market_cap': 611384164352, 'pe_ratio': 49.604652, 'pb_ratio': 9.762013, 'dividend_yield': None, 'eps': 4.3, 'beta': 2.427, '52_week_high': 299.29, '52_week_low': 152.37}}
+</tool_response>
+<|im_end|>
 <|im_start|>assistant
-<tool_call>
-{'arguments': {'symbol': 'TSLA'}, 'name': 'get_current_stock_price'}
-</tool_call><|im_end|>
-2024-02-24:15:46:10,900 INFO     [functioncall.py:65] all validations passed
-2024-02-24:15:46:10,900 INFO     [functioncall.py:66] parsed tool calls:
-[
-  {
-    "arguments": {
-      "symbol": "TSLA"
-    },
-    "name": "get_current_stock_price"
-  }
-]
-191.97
+Here is the stock fundamentals data for Tesla (TSLA), as provided by the function:
+
+```json
+{
+  "company_name": "Tesla, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Manufacturers",
+  "market_cap": 611384164352,
+  "pe_ratio": 49.604652,
+  "pb_ratio": 9.762013,
+  "dividend_yield": None,
+  "eps": 4.3,
+  "beta": 2.427,
+  "52_week_high": 299.29,
+  "52_week_low": 152.37
+}
+```json
 ```

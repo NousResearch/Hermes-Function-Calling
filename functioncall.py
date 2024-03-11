@@ -62,14 +62,10 @@ class ModelInference:
         if assistant_message:
             validation, tool_calls = validate_and_extract_tool_calls(assistant_message)
 
-            #if validation and all(validate_function_call_schema(tool_call, tools) for tool_call in tool_calls):
             if validation:
-                #inference_logger.info(f"all validations passed")
                 inference_logger.info(f"parsed tool calls:\n{json.dumps(tool_calls, indent=2)}")
                 return tool_calls, assistant_message
             else:
-                #inference_logger.info("Validation failed for function calls")
-                #inference_logger.info(f"Assistant message: {assistant_message}")
                 tool_calls = None
                 return tool_calls, assistant_message
         else:

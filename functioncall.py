@@ -13,6 +13,7 @@ from prompter import PromptManager
 from validator import validate_function_call_schema
 
 from utils import (
+    print_axolotl_text_art,
     inference_logger,
     get_assistant_message,
     get_chat_template,
@@ -21,6 +22,7 @@ from utils import (
 
 class ModelInference:
     def __init__(self, model_path, chat_template, load_in_4bit):
+        inference_logger.info(print_axolotl_text_art())
         self.prompter = PromptManager()
         self.bnb_config = None
 
@@ -53,23 +55,23 @@ class ModelInference:
         inference_logger.info(self.tokenizer.chat_template)
         inference_logger.info(self.tokenizer.special_tokens_map)
 
-    def process_completion_and_validate(self, completion, chat_template, tools):
+    def process_completion_and_validate(self, completion, chat_template):
 
         assistant_message = get_assistant_message(completion, chat_template, self.tokenizer.eos_token)
 
         if assistant_message:
             validation, tool_calls = validate_and_extract_tool_calls(assistant_message)
 
-            if validation and all(validate_function_call_schema(tool_call, tools) for tool_call in tool_calls):
-                inference_logger.info(f"all validations passed")
+            #if validation and all(validate_function_call_schema(tool_call, tools) for tool_call in tool_calls):
+            if validation:
+                #inference_logger.info(f"all validations passed")
                 inference_logger.info(f"parsed tool calls:\n{json.dumps(tool_calls, indent=2)}")
                 return tool_calls, assistant_message
             else:
-                inference_logger.info("Validation failed for function calls")
-                inference_logger.info(f"Assistant message: {assistant_message}")
-                if validation is False and assistant_message is None:
-                    inference_logger.warning("Validation failed: assistant message is none")
-                    raise ValueError("Validation failed for function calls")
+                #inference_logger.info("Validation failed for function calls")
+                #inference_logger.info(f"Assistant message: {assistant_message}")
+                tool_calls = None
+                return tool_calls, assistant_message
         else:
             inference_logger.warning("Assistant message is None")
             raise ValueError("Assistant message is None")
@@ -100,42 +102,55 @@ class ModelInference:
             eos_token_id=self.tokenizer.eos_token_id
         )
         completion = self.tokenizer.decode(tokens[0], skip_special_tokens=False, clean_up_tokenization_space=True)
-        inference_logger.info(f"model completion with prompt:\n{completion}")
-
         return completion
 
-    def generate_function_call(self, query, chat_template, num_fewshot):
+    def generate_function_call(self, query, chat_template, num_fewshot, max_depth=5):
         try:
-            chat = [
-                {"role": "user", "content": query}
-            ]
+            depth = 0
+            chat = [{"role": "user", "content": query}]
             tools = functions.get_openai_tools()
             prompt = self.prompter.generate_prompt(chat, tools, num_fewshot)
-
             completion = self.run_inference(prompt)
 
-            # Call the separate function for completion and validation
-            tool_calls, assistant_message = self.process_completion_and_validate(completion, chat_template, tools)
+            def recursive_loop(prompt, completion, depth):
+                nonlocal max_depth
+                tool_calls, assistant_message = self.process_completion_and_validate(completion, chat_template)
+                prompt.append({"role": "assistant", "content": assistant_message})
 
-            prompt.append({"role": "assistant", "content": assistant_message})
+                tool_message = f"Iteration {depth}\n"
+                if tool_calls:
+                    inference_logger.info(f"Assistant Message:\n{assistant_message}")
 
-            tool_message = ""
-            if tool_calls:
-                for tool_call in tool_calls:
-                    function_response = self.execute_function_call(tool_call)
+                    for tool_call in tool_calls:
+                        validation, message = validate_function_call_schema(tool_call, tools)
+                        if validation:
+                            try:
+                                function_response = self.execute_function_call(tool_call)
+                                tool_message += f"<tool_response>\n{function_response}\n</tool_response>\n"
+                                inference_logger.info(f"Here's the response from the function call: {tool_call.get("name")}\n{function_response}")
+                            except Exception as e:
+                                inference_logger.info(f"Could not execute function: {e}")
+                                tool_message += f"<tool_response>\nThere was an error when executing the function: {tool_call.get("name")}\nHere's the error traceback: {e}\nPlease call this function again with correct arguments within XML tags <tool_call></tool_call>\n</tool_response>\n"
+                        else:
+                            inference_logger.info(message)
+                            tool_message += f"<tool_response>\nThere was an error validating function call against function signature: {tool_call.get("name")}\nHere's the error traceback: {message}\nPlease call this function again with correct arguments within XML tags <tool_call></tool_call>\n</tool_response>\n"
+                    prompt.append({"role": "tool", "content": tool_message})
 
-                    # concatenate multiple tool call results 
-                    tool_message += f"<tool_response>\n{function_response}\n</tool_response>\n"
-                
-                prompt.append({"role": "tool", "content": tool_message})
-                tool_summary = self.run_inference(prompt)
-                print(tool_summary)
+                    depth += 1
+                    if depth >= max_depth:
+                        print(f"Maximum recursion depth reached ({max_depth}). Stopping recursion.")
+                        return
+
+                    completion = self.run_inference(prompt)
+                    recursive_loop(prompt, completion, depth)
+                elif tool_calls is None:
+                    inference_logger.info(f"Assistant Message:\n{assistant_message}")
+
+            recursive_loop(prompt, completion, depth)
 
         except Exception as e:
-            # Log the exception or perform any specific actions
             inference_logger.error(f"Exception occurred: {e}")
-            raise e 
-        
+            raise e
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Evaluate model performance on fireworks-ai dataset")
@@ -144,14 +159,15 @@ if __name__ == "__main__":
     parser.add_argument("--num_fewshot", type=int, default=None, help="Option to subset eval dataset")
     parser.add_argument("--load_in_4bit", type=str, default="False", help="Option to load in 4bit with bitsandbytes")
     parser.add_argument("--query", type=str, default="I need the current stock price of Tesla (TSLA)")
+    parser.add_argument("--max_depth", type=int, default=5, help="Maximum number of recursive iteration")
     args = parser.parse_args()
 
     # specify custom model path
     if args.model_path:
         inference = ModelInference(args.model_path, args.chat_template, args.load_in_4bit)
     else:
-        model_path = 'NousResearch/Nous-Hermes-2-PlusPlus-Mistral-7B'
+        model_path = 'NousResearch/Hermes-2-Pro-Mistral-7B-DPO-RC2'
         inference = ModelInference(model_path, args.chat_template, args.load_in_4bit)
         
     # Run the model evaluator
-    inference.generate_function_call(args.query, args.chat_template, args.num_fewshot)
+    inference.generate_function_call(args.query, args.chat_template, args.num_fewshot, args.max_depth)

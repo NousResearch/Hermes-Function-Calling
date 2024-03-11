@@ -71,27 +71,6 @@ def get_stock_fundamentals(symbol: str) -> dict:
         return {}
 
 @tool
-def get_historical_price_data(symbol: str, start_date: str, end_date: str) -> pd.DataFrame:
-    """
-    Get historical price data for a given stock symbol.
-
-    Args:
-    symbol (str): The stock symbol.
-    start_date (str): The start date for historical data (YYYY-MM-DD).
-    end_date (str): The end date for historical data (YYYY-MM-DD).
-
-    Returns:
-    pd.DataFrame: DataFrame containing historical price data.
-    """
-    try:
-        stock = yf.Ticker(symbol)
-        data = stock.history(start=start_date, end=end_date)
-        return data
-    except Exception as e:
-        print(f"Error fetching historical price data for {symbol}: {e}")
-        return pd.DataFrame()
-
-@tool
 def get_financial_statements(symbol: str) -> dict:
     """
     Get financial statements for a given stock symbol.
@@ -250,7 +229,7 @@ def get_openai_tools() -> List[dict]:
         get_key_financial_ratios,
         get_analyst_recommendations,
         get_dividend_data,
-        get_historical_price_data,
+        #get_historical_price_data,
         get_technical_indicators,
         execute_code
     ]

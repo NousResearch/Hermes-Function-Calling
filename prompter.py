@@ -1,3 +1,4 @@
+import datetime
 from pydantic import BaseModel
 from typing import Dict
 from schema import FunctionCall
@@ -60,6 +61,7 @@ class PromptManager:
         #schema = schema_json.get("properties", {})
 
         variables = {
+            "date": datetime.date.today(),
             "tools": tools,
             "examples": examples,
             "schema": schema_json

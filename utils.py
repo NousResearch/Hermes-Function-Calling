@@ -4,7 +4,9 @@ import re
 import json
 import logging
 import datetime
+import xml.sax.saxutils
 import xml.etree.ElementTree as ET
+from art import text2art
 from logging.handlers import RotatingFileHandler
 
 logging.basicConfig(
@@ -28,6 +30,14 @@ file_handler.setFormatter(formatter)
 
 inference_logger = logging.getLogger("function-calling-inference")
 inference_logger.addHandler(file_handler)
+
+def print_axolotl_text_art(suffix=None):
+    font = "nancyj"
+    ascii_text = "  nousresearch"
+    if suffix:
+        ascii_text += f"  x  {suffix}"
+    ascii_art = text2art(ascii_text, font=font)
+    print(ascii_art)
 
 def get_fewshot_examples(num_fewshot):
     """return a list of few shot examples"""
@@ -61,13 +71,18 @@ def get_assistant_message(completion, chat_template, eos_token):
     if chat_template == "zephyr":
         assistant_pattern = re.compile(r'<\|assistant\|>((?:(?!<\|assistant\|>).)*)$', re.DOTALL)
     elif chat_template == "chatml":
-        assistant_pattern = re.compile(r'<\\|im_start\\|>\s*assistant((?:(?!<\\|im_start\\|>\s*assistant).)*)$', re.DOTALL)
+        assistant_pattern = re.compile(r'<\|im_start\|>\s*assistant((?:(?!<\|im_start\|>\s*assistant).)*)$', re.DOTALL)
+
+    elif chat_template == "vicuna":
+        assistant_pattern = re.compile(r'ASSISTANT:\s*((?:(?!ASSISTANT:).)*)$', re.DOTALL)
     else:
         raise NotImplementedError(f"Handling for chat_template '{chat_template}' is not implemented.")
     
     assistant_match = assistant_pattern.search(completion)
     if assistant_match:
         assistant_content = assistant_match.group(1).strip()
+        if chat_template == "vicuna":
+            eos_token = f"</s>{eos_token}"
         return assistant_content.replace(eos_token, "")
     else:
         assistant_content = None
@@ -84,28 +99,31 @@ def validate_and_extract_tool_calls(assistant_content):
 
             # extract JSON data
             for element in root.findall(".//tool_call"):
-                json_text = element.text.strip()
-
+                json_data = None
                 try:
-                # Prioritize json.loads for better error handling
-                    json_data = json.loads(json_text)
-                except json.JSONDecodeError as json_err:
-                    try:
-                        # Fallback to ast.literal_eval if json.loads fails
-                        json_data = ast.literal_eval(json_text)
-                    except (SyntaxError, ValueError) as eval_err:
-                        inference_logger.error("JSON parsing failed with both json.loads and ast.literal_eval:")
-                        inference_logger.error("- JSON Decode Error: %s", json_err)
-                        inference_logger.error("- Fallback Syntax/Value Error: %s", eval_err)
-                        inference_logger.error("- Problematic JSON text: %s", json_text)
-                        continue
+                    json_text = element.text.strip()
 
-                tool_calls.append(json_data)
-                validation_result = True
+                    try:
+                    # Prioritize json.loads for better error handling
+                        json_data = json.loads(json_text)
+                    except json.JSONDecodeError as json_err:
+                        try:
+                            # Fallback to ast.literal_eval if json.loads fails
+                            json_data = ast.literal_eval(json_text)
+                        except (SyntaxError, ValueError) as eval_err:
+                            inference_logger.error("JSON parsing failed with both json.loads and ast.literal_eval:")
+                            inference_logger.error("- JSON Decode Error: %s", json_err)
+                            inference_logger.error("- Fallback Syntax/Value Error: %s", eval_err)
+                            inference_logger.error("- Problematic JSON text: %s", json_text)
+                            continue
+                except Exception as e:
+                    inference_logger.error(f"Cannot strip text: {e}")
+                if json_data is not None:
+                    tool_calls.append(json_data)
+                    validation_result = True
 
         except ET.ParseError as err:
             inference_logger.error("XML Parse Error: %s", err)
-
 
         # Return default values if no valid data is extracted
         return validation_result, tool_calls
@@ -117,12 +135,3 @@ def validate_tool_calls(generated_arguments, expected_arguments):
             inference_logger.info("Got: %s", generated_arguments.get(key))
             return "failed"
     return "passed"
-
-def calculate_pass_rate(eval_results):
-    passed_count =sum(1 for sample in eval_results if sample["result"] == "passed")
-    inference_logger.info("Number of eval tests passed: %s", passed_count)
-    inference_logger.info("Number of eval tests failed: %s", len(eval_results) - passed_count)
-
-    pass_rate = passed_count / len(eval_results)
-    inference_logger.info(f"fireworks-ai function-calling eval (pass@1): {pass_rate}")
-    return pass_rate

@@ -6,16 +6,12 @@ def validate_function_call_schema(call, signatures):
     try:
         call_data = FunctionCall(**call)
     except ValidationError as e:
-        inference_logger.info(f"Invalid function call: {e}")
-        return False
+        return False, str(e)
 
     for signature in signatures:
-        # Inside the main validation function
         try:
             signature_data = FunctionSignature(**signature)
-            
             if signature_data.function.name == call_data.name:
-
                 # Validate types in function arguments
                 for arg_name, arg_schema in signature_data.function.parameters.get('properties', {}).items():
                     if arg_name in call_data.arguments:
@@ -24,26 +20,21 @@ def validate_function_call_schema(call, signatures):
                             try:
                                 validate_argument_type(arg_name, call_arg_value, arg_schema)
                             except Exception as arg_validation_error:
-                                inference_logger.info(f"Invalid argument '{arg_name}': {arg_validation_error}")
-                                return False
+                                return False, str(arg_validation_error)
 
                 # Check if all required arguments are present
                 required_arguments = signature_data.function.parameters.get('required', [])
                 result, missing_arguments = check_required_arguments(call_data.arguments, required_arguments)
-
                 if not result:
-                    inference_logger.info(f"Missing required arguments: {missing_arguments}")
-                    return False
+                    return False, f"Missing required arguments: {missing_arguments}"
 
-                return True
+                return True, None
         except Exception as e:
             # Handle validation errors for the function signature
-            inference_logger.info(f"Error validating function call: {e}")
-            return False
+            return False, str(e)
 
-    # Moved the "No matching function signature found" message here
-    inference_logger.info(f"No matching function signature found for function: {call_data.name}")
-    return False
+    # No matching function signature found
+    return False, f"No matching function signature found for function: {call_data.name}"
 
 def check_required_arguments(call_arguments, required_arguments):
     missing_arguments = [arg for arg in required_arguments if arg not in call_arguments]

@@ -13,7 +13,7 @@ from prompter import PromptManager
 from validator import validate_function_call_schema
 
 from utils import (
-    print_axolotl_text_art,
+    print_nous_text_art,
     inference_logger,
     get_assistant_message,
     get_chat_template,
@@ -22,7 +22,7 @@ from utils import (
 
 class ModelInference:
     def __init__(self, model_path, chat_template, load_in_4bit):
-        inference_logger.info(print_axolotl_text_art())
+        inference_logger.info(print_nous_text_art())
         self.prompter = PromptManager()
         self.bnb_config = None
 
@@ -52,7 +52,6 @@ class ModelInference:
         
         inference_logger.info(self.model.config)
         inference_logger.info(self.model.generation_config)
-        inference_logger.info(self.tokenizer.chat_template)
         inference_logger.info(self.tokenizer.special_tokens_map)
 
     def process_completion_and_validate(self, completion, chat_template):
@@ -103,7 +102,8 @@ class ModelInference:
     def generate_function_call(self, query, chat_template, num_fewshot, max_depth=5):
         try:
             depth = 0
-            chat = [{"role": "user", "content": query}]
+            user_message = f"{query}\nThis is the first turn and you don't have <tool_results> to analyze yet"
+            chat = [{"role": "user", "content": user_message}]
             tools = functions.get_openai_tools()
             prompt = self.prompter.generate_prompt(chat, tools, num_fewshot)
             completion = self.run_inference(prompt)
@@ -113,7 +113,7 @@ class ModelInference:
                 tool_calls, assistant_message = self.process_completion_and_validate(completion, chat_template)
                 prompt.append({"role": "assistant", "content": assistant_message})
 
-                tool_message = f"Iteration {depth}\n"
+                tool_message = f"Agent iteration {depth} to assist with user query: {query}\n"
                 if tool_calls:
                     inference_logger.info(f"Assistant Message:\n{assistant_message}")
 

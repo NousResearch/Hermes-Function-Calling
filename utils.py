@@ -4,8 +4,8 @@ import re
 import json
 import logging
 import datetime
-import xml.sax.saxutils
 import xml.etree.ElementTree as ET
+
 from art import text2art
 from logging.handlers import RotatingFileHandler
 
@@ -31,7 +31,7 @@ file_handler.setFormatter(formatter)
 inference_logger = logging.getLogger("function-calling-inference")
 inference_logger.addHandler(file_handler)
 
-def print_axolotl_text_art(suffix=None):
+def print_nous_text_art(suffix=None):
     font = "nancyj"
     ascii_text = "  nousresearch"
     if suffix:

@@ -1,24 +1,81 @@
+Here's an updated version of your README with the requested additions:
+
 # Hermes-Function-Calling
 
-## Install required packages
+This repository contains code for the Hermes Pro Large Language Model to perform function calling based on the provided schema. It allows users to query the model and retrieve information related to stock prices, company fundamentals, financial statements, and more.
+
+## Installation
+
+To install the required packages, run the following command:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-## Run function call inference with query
+## Usage
+
+To run the function call inference with a query, use the following command:
+
 ```bash
-python functioncall.py --query "I need the current stock price of Tesla (TSLA)"`
+python functioncall.py --query "I need the current stock price of Tesla (TSLA)"
 ```
-### Command line arguments:
-```yaml
---model_path: Path to the model folder (default: "NousResearch/Nous-Hermes-2-PlusPlus-Mistral-7B)".
---chat_template: Chat template for prompt formatting (default: "chatml").
---num_fewshot: Option to include few shot examples (default: None).
---load_in_4bit: Option to load in 4bit with bitsandbytes (default: "False").
---query: Query to be used for function call inference (default: "I need the current stock price of Tesla (TSLA)").
---max_depth: Maximum number of recursive iteration (default: 5).
+
+### Command Line Arguments
+
+- `--model_path`: Path to the model folder (default: "NousResearch/Nous-Hermes-2-PlusPlus-Mistral-7B").
+- `--chat_template`: Chat template for prompt formatting (default: "chatml").
+- `--num_fewshot`: Option to include few-shot examples (default: None).
+- `--load_in_4bit`: Option to load in 4bit with bitsandbytes (default: "False").
+- `--query`: Query to be used for function call inference (default: "I need the current stock price of Tesla (TSLA)").
+- `--max_depth`: Maximum number of recursive iterations (default: 5).
+
+## Adding Custom Functions
+
+To add your own functions for the model to use, you can modify the `functions.py` script. This script contains various functions that retrieve stock-related information using the `yfinance` library.
+
+Here's an example of how to add a new function:
+
+```python
+@tool
+def get_new_function(symbol: str) -> dict:
+    """
+    Description of the new function.
+    Args:
+        symbol (str): The stock symbol.
+    Returns:
+        dict: Dictionary containing the desired information.
+    """
+    try:
+        # Implement the logic to retrieve the desired information
+        # using the yfinance library or any other relevant libraries
+        # Example:
+        stock = yf.Ticker(symbol)
+        new_info = stock.new_method()
+        return new_info
+    except Exception as e:
+        print(f"Error fetching new information for {symbol}: {e}")
+        return {}
 ```
-## Inference example output
+
+After defining your new function, make sure to add it to the `get_openai_tools()` function in the `functions.py` script:
+
+```python
+def get_openai_tools() -> List[dict]:
+    functions = [
+        # ...
+        get_new_function,
+        # ...
+    ]
+    tools = [convert_to_openai_tool(f) for f in functions]
+    return tools
+```
+
+This will ensure that your new function is included in the list of available tools for the model to use.
+
+## Inference Example Output
+
+Here's an example of the inference output:
+
 ```
 <|im_start|>user
 Fetch the stock fundamentals data for Tesla (TSLA)<|im_end|>
@@ -45,7 +102,6 @@ The stock fundamentals data for Tesla (TSLA) are as follows:
 - **Beta Value of the Stock**: 2.42
 - **52-Week High Price of the Stock**: $299.29
 - **52-Week Low Price of the Stock**: $152.37
-
 This information provides a snapshot of Tesla's financial position and performance based on the fundamental data obtained from the yfinance API. It shows that Tesla has a substantial market capitalization and a relatively high P/E and P/B ratio compared to other stocks in its industry. The company does not pay a dividend at the moment, which is reflected by a 'Dividend Yield' of 'None'. The Beta value indicates that Tesla's stock has a moderate level of volatility relative to the market. The 52-week high and low prices give an idea of the stock's range over the past year. This data can be useful when assessing investment opportunities and making investment decisions.
 ```
 ## Prompt Format

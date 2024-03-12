@@ -72,6 +72,18 @@ def get_openai_tools() -> List[dict]:
 
 This will ensure that your new function is included in the list of available tools for the model to use.
 
+## Key Scripts
+
+The repository contains several key scripts that work together to enable function calling with the Hermes Pro Large Language Model:
+
+- `functions.py`: This script is where all the functions/tools you want the model to have access to are made available.
+
+- `functioncall.py`: This script is the main entry point for running the function call inference. It initializes the model, tokenizer, and other necessary components, and handles the recursive loop for generating function calls and executing them.
+
+- `prompter.py`: This script manages the prompt generation process. It reads the system prompt from a YAML file, formats it with the necessary variables (e.g., tools, examples, schema), and generates the final prompt for the model.
+
+- `schema.py`: This script defines the Pydantic models used for representing function calls and function definitions. It provides a structured way to define and validate the function call schema.
+
 ## Inference Example Output
 
 Here's an example of the inference output:

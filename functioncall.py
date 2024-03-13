@@ -59,14 +59,14 @@ class ModelInference:
         assistant_message = get_assistant_message(completion, chat_template, self.tokenizer.eos_token)
 
         if assistant_message:
-            validation, tool_calls = validate_and_extract_tool_calls(assistant_message)
+            validation, tool_calls, error_message = validate_and_extract_tool_calls(assistant_message)
 
             if validation:
                 inference_logger.info(f"parsed tool calls:\n{json.dumps(tool_calls, indent=2)}")
-                return tool_calls, assistant_message
+                return tool_calls, assistant_message, error_message
             else:
                 tool_calls = None
-                return tool_calls, assistant_message
+                return tool_calls, assistant_message, error_message
         else:
             inference_logger.warning("Assistant message is None")
             raise ValueError("Assistant message is None")
@@ -110,7 +110,7 @@ class ModelInference:
 
             def recursive_loop(prompt, completion, depth):
                 nonlocal max_depth
-                tool_calls, assistant_message = self.process_completion_and_validate(completion, chat_template)
+                tool_calls, assistant_message, error_message = self.process_completion_and_validate(completion, chat_template)
                 prompt.append({"role": "assistant", "content": assistant_message})
 
                 tool_message = f"Agent iteration {depth} to assist with user query: {query}\n"
@@ -139,7 +139,19 @@ class ModelInference:
 
                     completion = self.run_inference(prompt)
                     recursive_loop(prompt, completion, depth)
-                elif tool_calls is None:
+                elif error_message:
+                    inference_logger.info(f"Assistant Message:\n{assistant_message}")
+                    tool_message += f"<tool_response>\nThere was an error parsing function calls\n Here's the error stack trace: {error_message}\nPlease call the function again with correct syntax<tool_response>"
+                    prompt.append({"role": "tool", "content": tool_message})
+
+                    depth += 1
+                    if depth >= max_depth:
+                        print(f"Maximum recursion depth reached ({max_depth}). Stopping recursion.")
+                        return
+
+                    completion = self.run_inference(prompt)
+                    recursive_loop(prompt, completion, depth)
+                else:
                     inference_logger.info(f"Assistant Message:\n{assistant_message}")
 
             recursive_loop(prompt, completion, depth)

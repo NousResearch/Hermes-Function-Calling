@@ -19,6 +19,7 @@ Tools: |
   <tool_call>
   {{'arguments': {{'code_markdown': <python-code>, 'name': 'code_interpreter'}}}}
   </tool_call>
+  Make sure that the json object above with code markdown block is parseable with json.loads() and the XML block with XML ElementTree.
 Examples: |
   Here are some example usage of functions:
   {examples}

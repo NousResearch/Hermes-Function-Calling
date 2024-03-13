@@ -69,23 +69,6 @@ class ModelInference:
         inference_logger.info(self.model.config)
         inference_logger.info(self.model.generation_config)
         inference_logger.info(self.tokenizer.special_tokens_map)
-
-    def process_completion_and_validate(self, completion, chat_template):
-
-        assistant_message = get_assistant_message(completion, chat_template, self.tokenizer.eos_token)
-
-        if assistant_message:
-            validation, tool_calls, error_message = validate_and_extract_tool_calls(assistant_message)
-
-            if validation:
-                inference_logger.info(f"parsed tool calls:\n{json.dumps(tool_calls, indent=2)}")
-                return tool_calls, assistant_message, error_message
-            else:
-                tool_calls = None
-                return tool_calls, assistant_message, error_message
-        else:
-            inference_logger.warning("Assistant message is None")
-            raise ValueError("Assistant message is None")
     
     def run_inference(self, prompt):
         inputs = self.tokenizer.apply_chat_template(

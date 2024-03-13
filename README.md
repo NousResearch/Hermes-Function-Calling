@@ -13,6 +13,7 @@ pip install -r requirements.txt
 ```
 
 ## Usage
+### Function calling
 
 To run the function call inference with a query, use the following command:
 
@@ -20,7 +21,16 @@ To run the function call inference with a query, use the following command:
 python functioncall.py --query "I need the current stock price of Tesla (TSLA)"
 ```
 
-### Command Line Arguments
+### Json mode
+
+To run the json mode inference with a query, use the following command:
+
+```bash
+python jsonmode.py --query "Please return a json object to represent Goku from the anime Dragon Ball Z?"
+
+```
+
+#### Command Line Arguments
 
 - `--model_path`: Path to the model folder (default: "NousResearch/Nous-Hermes-2-PlusPlus-Mistral-7B").
 - `--chat_template`: Chat template for prompt formatting (default: "chatml").
@@ -72,6 +82,33 @@ def get_openai_tools() -> List[dict]:
 
 This will ensure that your new function is included in the list of available tools for the model to use.
 
+## Adding Custom Pydantic Model
+
+To add your own pydantic models to create json schema for the model to use, you can replace the pydantic models in the `jsonmode.py` script. 
+
+Here's an example of how to add a new pydantic model:
+
+```python
+from typing import List, Optional
+from pydantic import BaseModel
+
+class Character(BaseModel):
+    name: str
+    species: str
+    role: str
+    personality_traits: Optional[List[str]]
+    special_attacks: Optional[List[str]]
+
+    class Config:
+        schema_extra = {
+            "additionalProperties": False
+        }
+```
+You need to serialize the pydantic model into json schema as follows:
+
+```python
+pydantic_schema = Character.schema_json()
+```
 ## Key Scripts
 
 The repository contains several key scripts that work together to enable function calling with the Hermes Pro Large Language Model:
@@ -79,6 +116,8 @@ The repository contains several key scripts that work together to enable functio
 - `functions.py`: This script is where all the functions/tools you want the model to have access to are made available.
 
 - `functioncall.py`: This script is the main entry point for running the function call inference. It initializes the model, tokenizer, and other necessary components, and handles the recursive loop for generating function calls and executing them.
+
+- `jsonmode.py`: This script can be used for running json mode inference. It has similar functionality as functioncall.py but for generating json object adhering to the json schema and validating it.
 
 - `prompter.py`: This script manages the prompt generation process. It reads the system prompt from a YAML file, formats it with the necessary variables (e.g., tools, examples, schema), and generates the final prompt for the model.
 

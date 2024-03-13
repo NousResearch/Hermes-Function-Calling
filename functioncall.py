@@ -161,10 +161,10 @@ class ModelInference:
             raise e
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Evaluate model performance on fireworks-ai dataset")
+    parser = argparse.ArgumentParser(description="Run recursive function calling loop")
     parser.add_argument("--model_path", type=str, help="Path to the model folder")
     parser.add_argument("--chat_template", type=str, default="chatml", help="Chat template for prompt formatting")
-    parser.add_argument("--num_fewshot", type=int, default=None, help="Option to subset eval dataset")
+    parser.add_argument("--num_fewshot", type=int, default=None, help="Option to use json mode examples")
     parser.add_argument("--load_in_4bit", type=str, default="False", help="Option to load in 4bit with bitsandbytes")
     parser.add_argument("--query", type=str, default="I need the current stock price of Tesla (TSLA)")
     parser.add_argument("--max_depth", type=int, default=5, help="Maximum number of recursive iteration")

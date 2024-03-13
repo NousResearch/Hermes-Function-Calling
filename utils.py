@@ -134,10 +134,26 @@ def validate_and_extract_tool_calls(assistant_content):
     # Return default values if no valid data is extracted
     return validation_result, tool_calls, error_message
 
-def validate_tool_calls(generated_arguments, expected_arguments):
-    for key, expected_value in expected_arguments.items():
-        if generated_arguments.get(key) != expected_value:
-            inference_logger.info("Expected: %s", expected_value)
-            inference_logger.info("Got: %s", generated_arguments.get(key))
-            return "failed"
-    return "passed"
+def extract_json_from_markdown(text):
+    """
+    Extracts the JSON string from the given text using a regular expression pattern.
+    
+    Args:
+        text (str): The input text containing the JSON string.
+        
+    Returns:
+        dict: The JSON data loaded from the extracted string, or None if the JSON string is not found.
+    """
+    json_pattern = r'```json\r?\n(.*?)\r?\n```'
+    match = re.search(json_pattern, text, re.DOTALL)
+    if match:
+        json_string = match.group(1)
+        try:
+            data = json.loads(json_string)
+            return data
+        except json.JSONDecodeError as e:
+            print(f"Error decoding JSON string: {e}")
+    else:
+        print("JSON string not found in the text.")
+    return None
+

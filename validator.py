@@ -1,5 +1,8 @@
+import ast
+import json
+from jsonschema import validate
 from pydantic import ValidationError
-from utils import inference_logger
+from utils import inference_logger, extract_json_from_markdown
 from schema import FunctionCall, FunctionSignature
 
 def validate_function_call_schema(call, signatures):
@@ -73,3 +76,57 @@ def get_python_type(json_type):
         'null': type(None),
     }
     return type_mapping[json_type]
+
+def validate_json_data(json_object, json_schema):
+    valid = False
+    error_message = None
+    result_json = None
+
+    try:
+        # Attempt to load JSON using json.loads
+        try:
+            result_json = json.loads(json_object)
+        except json.decoder.JSONDecodeError:
+            # If json.loads fails, try ast.literal_eval
+            try:
+                result_json = ast.literal_eval(json_object)
+            except (SyntaxError, ValueError) as e:
+                try:
+                    result_json = extract_json_from_markdown(json_object)
+                except Exception as e:
+                    error_message = f"JSON decoding error: {e}"
+                    inference_logger.info(f"Validation failed for JSON data: {error_message}")
+                    return valid, result_json, error_message
+
+        # Return early if both json.loads and ast.literal_eval fail
+        if result_json is None:
+            error_message = "Failed to decode JSON data"
+            inference_logger.info(f"Validation failed for JSON data: {error_message}")
+            return valid, result_json, error_message
+
+        # Validate each item in the list against schema if it's a list
+        if isinstance(result_json, list):
+            for index, item in enumerate(result_json):
+                try:
+                    validate(instance=item, schema=json_schema)
+                    inference_logger.info(f"Item {index+1} is valid against the schema.")
+                except ValidationError as e:
+                    error_message = f"Validation failed for item {index+1}: {e}"
+                    break
+        else:
+            # Default to validation without list
+            try:
+                validate(instance=result_json, schema=json_schema)
+            except ValidationError as e:
+                error_message = f"Validation failed: {e}"
+
+    except Exception as e:
+        error_message = f"Error occurred: {e}"
+
+    if error_message is None:
+        valid = True
+        inference_logger.info("JSON data is valid against the schema.")
+    else:
+        inference_logger.info(f"Validation failed for JSON data: {error_message}")
+
+    return valid, result_json, error_message

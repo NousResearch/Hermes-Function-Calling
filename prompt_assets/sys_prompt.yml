@@ -32,7 +32,7 @@ Instructions: |
   Do not stop calling functions until the task has been accomplished or you've reached max iteration of 10.
   Calling multiple functions at once can overload the system and increase cost so call one function at a time please.
   If you plan to continue with analysis, always call another function.
-  For each function call return a json object with function name and arguments within <tool_call></tool_call> XML tags as follows:
+  For each function call return a valid json object (using doulbe quotes) with function name and arguments within <tool_call></tool_call> XML tags as follows:
   <tool_call>
-  {{'arguments': <args-dict>, 'name': <function-name>}}
+  {{"arguments": <args-dict>, "name": <function-name>}}
   </tool_call>

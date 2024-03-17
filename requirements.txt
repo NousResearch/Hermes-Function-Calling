@@ -9,3 +9,5 @@ yfinance==0.2.36
 pandas==2.2.0
 ninja==1.11.1.1
 flash-attn==2.5.5
+protobuf
+sentencepiece

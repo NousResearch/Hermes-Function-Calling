@@ -1,5 +1,5 @@
 torch==2.1.2
-transformers @ git+https://github.com/huggingface/transformers.git@ae49b218c3d718df90d8e4a109016450fb8f0632
+transformers>=4.38.1
 bitsandbytes>=0.41.1
 accelerate==0.27.2
 langchain==0.1.9

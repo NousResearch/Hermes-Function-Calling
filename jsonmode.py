@@ -91,7 +91,7 @@ class ModelInference:
     def generate_json_completion(self, query, chat_template, max_depth=5):
         try:
             depth = 0
-            sys_prompt = "You are a helpful assistant that answers in JSON. Here's the json schema you must adhere to:\n<schema>\n{schema}\n<schema>"
+            sys_prompt = f"You are a helpful assistant that answers in JSON. Here's the json schema you must adhere to:\n<schema>\n{pydantic_schema}\n<schema>"
             prompt = [{"role": "system", "content": sys_prompt}]
             prompt.append({"role": "user", "content": query})
 

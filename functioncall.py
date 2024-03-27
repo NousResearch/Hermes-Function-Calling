@@ -123,13 +123,13 @@ class ModelInference:
                             try:
                                 function_response = self.execute_function_call(tool_call)
                                 tool_message += f"<tool_response>\n{function_response}\n</tool_response>\n"
-                                inference_logger.info(f"Here's the response from the function call: {tool_call.get("name")}\n{function_response}")
+                                inference_logger.info(f"Here's the response from the function call: {tool_call.get('name')}\n{function_response}")
                             except Exception as e:
                                 inference_logger.info(f"Could not execute function: {e}")
-                                tool_message += f"<tool_response>\nThere was an error when executing the function: {tool_call.get("name")}\nHere's the error traceback: {e}\nPlease call this function again with correct arguments within XML tags <tool_call></tool_call>\n</tool_response>\n"
+                                tool_message += f"<tool_response>\nThere was an error when executing the function: {tool_call.get('name')}\nHere's the error traceback: {e}\nPlease call this function again with correct arguments within XML tags <tool_call></tool_call>\n</tool_response>\n"
                         else:
                             inference_logger.info(message)
-                            tool_message += f"<tool_response>\nThere was an error validating function call against function signature: {tool_call.get("name")}\nHere's the error traceback: {message}\nPlease call this function again with correct arguments within XML tags <tool_call></tool_call>\n</tool_response>\n"
+                            tool_message += f"<tool_response>\nThere was an error validating function call against function signature: {tool_call.get('name')}\nHere's the error traceback: {message}\nPlease call this function again with correct arguments within XML tags <tool_call></tool_call>\n</tool_response>\n"
                     prompt.append({"role": "tool", "content": tool_message})
 
                     depth += 1

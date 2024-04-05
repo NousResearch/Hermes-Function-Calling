@@ -15,17 +15,20 @@ from langchain_core.utils.function_calling import convert_to_openai_tool
 def code_interpreter(code_markdown: str) -> dict | str:
     """
     Execute the provided Python code string on the terminal using exec.
-    The string should contain valid, executable and pure python code in markdown syntax.
-    Code should also import any required python packages.
 
-    Parameters:
-    - code_markdown (str): The Python code with markdown syntax to be executed.
-      for eg. ```python\n<code-string>\n```
+    The string should contain valid, executable and pure Python code in markdown syntax.
+    Code should also import any required Python packages.
+
+    Args:
+        code_markdown (str): The Python code with markdown syntax to be executed.
+            For example: ```python\n<code-string>\n```
 
     Returns:
-    dict: A dictionary containing variables declared and values returned by function calls.
+        dict | str: A dictionary containing variables declared and values returned by function calls,
+            or an error message if an exception occurred.
 
-    Note: Use this function with caution, as executing arbitrary code can pose security risks.
+    Note:
+        Use this function with caution, as executing arbitrary code can pose security risks.
     """
     try:
         # Extracting code from Markdown code block

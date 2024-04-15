@@ -296,7 +296,7 @@ def get_company_profile(symbol: str) -> dict:
         return {}
 
 def get_openai_tools() -> List[dict]:
-    functions = [
+    old_functions = [
         code_interpreter,
         google_search_and_scrape,
         get_current_stock_price,
@@ -309,6 +309,8 @@ def get_openai_tools() -> List[dict]:
         get_dividend_data,
         get_technical_indicators
     ]
+    ### Should be the same as above
+    functions = [func for func in dir(__main__) if inspect.isfunction(getattr(__main__, func)) and getattr(__main__, func).__module__ == '__main__']
 
     tools = [convert_to_openai_tool(f) for f in functions]
     return tools

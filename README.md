@@ -30,7 +30,7 @@ python jsonmode.py --query "Please return a json object to represent Goku from t
 
 #### Command Line Arguments
 
-- `--model_path`: Path to the model folder (default: "NousResearch/Hermes-2-Pro-Mistral-7B").
+- `--model_path`: Path to the model folder (default: "NousResearch/Hermes-2-Pro-Llama-3-8B").
 - `--chat_template`: Chat template for prompt formatting (default: "chatml").
 - `--num_fewshot`: Option to include few-shot examples (default: None).
 - `--load_in_4bit`: Option to load in 4bit with bitsandbytes (default: "False").

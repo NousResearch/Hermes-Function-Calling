@@ -174,7 +174,7 @@ if __name__ == "__main__":
     if args.model_path:
         inference = ModelInference(args.model_path, args.chat_template, args.load_in_4bit)
     else:
-        model_path = 'NousResearch/Hermes-2-Pro-Mistral-7B'
+        model_path = 'NousResearch/Hermes-2-Pro-Llama-3-8B'
         inference = ModelInference(model_path, args.chat_template, args.load_in_4bit)
         
     # Run the model evaluator

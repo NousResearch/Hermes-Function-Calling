@@ -12,3 +12,4 @@ flash-attn==2.5.5
 protobuf
 sentencepiece
 art
+yfinance

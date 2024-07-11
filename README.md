@@ -235,3 +235,12 @@ The stock fundamentals data for Tesla (TSLA) are as follows:
 
 This information provides a snapshot of Tesla's financial position and performance based on the fundamental data obtained from the yfinance API. It shows that Tesla has a substantial market capitalization and a relatively high P/E and P/B ratio compared to other stocks in its industry. The company does not pay a dividend at the moment, which is reflected by a 'Dividend Yield' of 'None'. The Beta value indicates that Tesla's stock has a moderate level of volatility relative to the market. The 52-week high and low prices give an idea of the stock's range over the past year. This data can be useful when assessing investment opportunities and making investment decisions.<|im_end|>
 ```
+## Prompt Format for JSON Mode / Structured Outputs
+Our model was also trained on a specific system prompt for Structured Outputs, which should respond with only a json object response, in a specific json schema.
+
+Your schema can be made from a pydantic object using our codebase, with the standalone script jsonmode.py available here: https://github.com/NousResearch/Hermes-Function-Calling/tree/main
+```
+<|im_start|>system
+You are a helpful assistant that answers in JSON. Here's the json schema you must adhere to:\n<schema>\n{schema}\n</schema><|im_end|>
+```
+Given the {schema} that you provide, it should follow the format of that json to create it's response, all you have to do is give a typical user prompt, and it will respond in JSON.

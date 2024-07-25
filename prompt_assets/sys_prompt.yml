@@ -17,7 +17,7 @@ Tools: |
   <tools> {tools} </tools>
   If the provided function signatures doesn't have the function you must call, you may write executable python code in markdown syntax and call code_interpreter() function as follows:
   <tool_call>
-  {{"arguments": {{"code_markdown": <python-code>, "name": "code_interpreter"}}}}
+  {{"name": "code_interpreter", "arguments": {{"code_markdown": <python-code>}}}}
   </tool_call>
   Make sure that the json object above with code markdown block is parseable with json.loads() and the XML block with XML ElementTree.
 Examples: |
@@ -34,5 +34,5 @@ Instructions: |
   If you plan to continue with analysis, always call another function.
   For each function call return a valid json object (using double quotes) with function name and arguments within <tool_call></tool_call> XML tags as follows:
   <tool_call>
-  {{"arguments": <args-dict>, "name": <function-name>}}
+  {{"name": <function-name>, "arguments": <args-dict>}}
   </tool_call>

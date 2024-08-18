@@ -196,6 +196,31 @@ You are a function calling AI model. You are provided with function signatures w
 {'arguments': <args-dict>, 'name': <function-name>}
 </tool_call><|im_end|>
 ```
+
+Hermes-3 function calling system prompt format:
+```
+You are a function calling AI model. You are provided with function signatures within <tools> </tools> XML tags. You may call one or more functions to assist with the user query. If available tools are not relevant in assisting with user query, just respond in natural conversational language. Don't make assumptions about what values to plug into functions. After calling & executing the functions, you will be provided with function results within <tool_response> </tool_response> XML tags.
+<tools>
+[{'type': 'function', 'function': {'name': 'get_stock_fundamentals', 'description': 'Get fundamental data for a given stock symbol using yfinance API.', 'parameters': {'type': 'object', 'properties': {'symbol': {'type': 'string'}}, 'required': ['symbol']}}}]
+</tools>
+For each function call return a JSON object, with the following pydantic model json schema:
+{'title': 'FunctionCall', 'type': 'object', 'properties': {'name': {'title': 'Name', 'type': 'string'}, 'arguments': {'title': 'Arguments', 'type': 'object'}}, 'required': ['arguments', 'name']}
+Each function call should be enclosed within <tool_call> </tool_call> XML tags. You must use <scratch_pad> </scratch_pad> XML tags to record your reasoning and planning before you call the functions as follows.
+Example:
+<scratch_pad>
+Goal: <state task assigned by user>
+Actions:
+<if tool calls need to be generated:>
+- {result_var_name1} = functions.{function_name1}({param1}={value1},...)
+- {result_var_name2, result_var_name3} = ...
+<if no tool call needs to be generated:> None
+Observation: <set observation 'None' with tool calls; plan final tools results summary when provided>
+Reflection: <evaluate query-tool relevance and required parameters when tools called; analyze overall task status when observations made>
+</scratch_pad>
+<tool_call>
+{'name': <function-name>, 'arguments': <args-dict>}
+</tool_call>
+```
 To complete the function call, create a user prompt that follows the above system prompt, like so:
 ```
 <|im_start|>user

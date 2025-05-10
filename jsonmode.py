@@ -113,7 +113,7 @@ class ModelInference:
                     elif error_message:
                         inference_logger.info(f"Assistant Message:\n{assistant_message}")
                         inference_logger.info(f"json schema validation failed")
-                        tool_message += f"<tool_response>\nJson schema validation failed\nHere's the error stacktrace: {error_message}\nPlease return corrrect json object\n<tool_response>"
+                        tool_message += f"<tool_response>\nJson schema validation failed\nHere's the error stacktrace: {error_message}\nPlease return correct json object\n<tool_response>"
                         
                         depth += 1
                         if depth >= max_depth:

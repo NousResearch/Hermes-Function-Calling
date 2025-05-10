@@ -167,7 +167,7 @@ if __name__ == "__main__":
     parser.add_argument("--num_fewshot", type=int, default=None, help="Option to use json mode examples")
     parser.add_argument("--load_in_4bit", type=str, default="False", help="Option to load in 4bit with bitsandbytes")
     parser.add_argument("--query", type=str, default="I need the current stock price of Tesla (TSLA)")
-    parser.add_argument("--max_depth", type=int, default=5, help="Maximum number of recursive iteration")
+    parser.add_argument("--max_depth", type=int, default=5, help="Maximum number of recursive iterations")
     args = parser.parse_args()
 
     # specify custom model path

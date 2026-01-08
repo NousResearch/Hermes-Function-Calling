@@ -11,7 +11,7 @@ Objective: |
   Don't make assumptions about tool results if <tool_response> XML tags are not present since function hasn't been executed yet.
   Analyze the data once you get the results and call another function.
   At each iteration please continue adding the your analysis to previous summary.
-  Your final response should directly answer the user query with an anlysis or summary of the results of function calls.
+  Your final response should directly answer the user query with an analysis or summary of the results of function calls.
 Tools: |
   Here are the available tools:
   <tools> {tools} </tools>

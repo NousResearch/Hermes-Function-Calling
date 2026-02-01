@@ -295,6 +295,58 @@ def get_company_profile(symbol: str) -> dict:
         print(f"Error fetching company profile for {symbol}: {e}")
         return {}
 
+@tool
+def get_weather(location: str) -> dict:
+    """
+    Get current weather information for a given location using the wttr.in API.
+
+    Args:
+        location (str): The city name or location to get weather for (e.g., "London", "New York", "Tokyo").
+
+    Returns:
+        dict: A dictionary containing weather information.
+            Keys:
+                - 'location': The requested location.
+                - 'temperature_c': Current temperature in Celsius.
+                - 'temperature_f': Current temperature in Fahrenheit.
+                - 'condition': Weather condition description.
+                - 'humidity': Humidity percentage.
+                - 'wind_speed_kmh': Wind speed in km/h.
+                - 'wind_direction': Wind direction.
+                - 'feels_like_c': Feels like temperature in Celsius.
+                - 'precipitation_mm': Precipitation in millimeters.
+    """
+    try:
+        # wttr.in API with JSON format
+        url = f"https://wttr.in/{location}?format=j1"
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        
+        data = response.json()
+        current = data['current_condition'][0]
+        
+        weather_info = {
+            'location': location,
+            'temperature_c': current.get('temp_C', 'N/A'),
+            'temperature_f': current.get('temp_F', 'N/A'),
+            'condition': current.get('weatherDesc', [{}])[0].get('value', 'N/A'),
+            'humidity': current.get('humidity', 'N/A'),
+            'wind_speed_kmh': current.get('windspeedKmph', 'N/A'),
+            'wind_direction': current.get('winddir16Point', 'N/A'),
+            'feels_like_c': current.get('FeelsLikeC', 'N/A'),
+            'precipitation_mm': current.get('precipMM', 'N/A')
+        }
+        
+        return weather_info
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching weather for {location}: {e}")
+        return {'error': f"Failed to fetch weather data: {str(e)}"}
+    except (KeyError, IndexError) as e:
+        print(f"Error parsing weather data for {location}: {e}")
+        return {'error': f"Failed to parse weather data: {str(e)}"}
+
 def get_openai_tools() -> List[dict]:
     functions = [
         code_interpreter,
@@ -307,7 +359,8 @@ def get_openai_tools() -> List[dict]:
         get_key_financial_ratios,
         get_analyst_recommendations,
         get_dividend_data,
-        get_technical_indicators
+        get_technical_indicators,
+        get_weather
     ]
 
     tools = [convert_to_openai_tool(f) for f in functions]

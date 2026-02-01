@@ -37,9 +37,41 @@ python jsonmode.py --query "Please return a json object to represent Goku from t
 - `--query`: Query to be used for function call inference (default: "I need the current stock price of Tesla (TSLA)").
 - `--max_depth`: Maximum number of recursive iterations (default: 5).
 
+## Available Functions
+
+The repository includes the following built-in functions:
+
+### Stock/Financial Functions
+- `get_current_stock_price` - Get current stock price for a symbol
+- `get_stock_fundamentals` - Get fundamental data (PE ratio, market cap, etc.)
+- `get_financial_statements` - Get income statement, balance sheet, cash flow
+- `get_key_financial_ratios` - Get key financial ratios
+- `get_analyst_recommendations` - Get analyst recommendations
+- `get_dividend_data` - Get dividend history
+- `get_company_news` - Get company news and press releases
+- `get_technical_indicators` - Get technical indicators
+- `get_company_profile` - Get company profile and overview
+
+### Utility Functions
+- `code_interpreter` - Execute Python code
+- `google_search_and_scrape` - Search Google and scrape results
+
+### Weather Function
+- `get_weather` - Get current weather for any location using wttr.in API
+
+Example usage:
+```bash
+python functioncall.py --query "What's the weather like in Tokyo?"
+```
+
+Example output:
+```json
+{"location": "Tokyo", "temperature_c": "18", "temperature_f": "64", "condition": "Partly cloudy", "humidity": "72", "wind_speed_kmh": "11", "wind_direction": "NE", "feels_like_c": "18", "precipitation_mm": "0.0"}
+```
+
 ## Adding Custom Functions
 
-To add your own functions for the model to use, you can modify the `functions.py` script. This script contains various functions that retrieve stock-related information using the `yfinance` library.
+To add your own functions for the model to use, you can modify the `functions.py` script. This script contains various functions that retrieve stock-related information using the `yfinance` library, as well as other utility functions like weather lookup.
 
 Here's an example of how to add a new function:
 

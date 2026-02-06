@@ -13,22 +13,17 @@ from langchain_core.utils.function_calling import convert_to_openai_tool
 
 @tool
 def code_interpreter(code_markdown: str) -> dict | str:
-    """
-    Execute the provided Python code string on the terminal using exec.
-
-    The string should contain valid, executable and pure Python code in markdown syntax.
-    Code should also import any required Python packages.
+    """Execute the provided Python code string on the terminal using exec.
 
     Args:
         code_markdown (str): The Python code with markdown syntax to be executed.
-            For example: ```python\n<code-string>\n```
+            The string should contain valid, executable and pure Python code
+            in markdown syntax. Code should also import any required packages.
 
     Returns:
-        dict | str: A dictionary containing variables declared and values returned by function calls,
-            or an error message if an exception occurred.
-
-    Note:
-        Use this function with caution, as executing arbitrary code can pose security risks.
+        dict | str: A dictionary containing variables declared and values
+            returned by function calls, or an error message if an exception
+            occurred.
     """
     try:
         # Extracting code from Markdown code block
@@ -64,14 +59,14 @@ def code_interpreter(code_markdown: str) -> dict | str:
 
 @tool
 def google_search_and_scrape(query: str) -> dict:
-    """
-    Performs a Google search for the given query, retrieves the top search result URLs,
-    and scrapes the text content and table data from those pages in parallel.
+    """Perform a Google search and scrape text content from top results.
 
     Args:
         query (str): The search query.
+
     Returns:
-        list: A list of dictionaries containing the URL, text content, and table data for each scraped page.
+        dict: A list of dictionaries containing the URL, text content, and
+            table data for each scraped page.
     """
     num_results = 2
     url = 'https://www.google.com/search'
@@ -101,15 +96,14 @@ def google_search_and_scrape(query: str) -> dict:
 
 @tool
 def get_current_stock_price(symbol: str) -> float:
-  """
-  Get the current stock price for a given symbol.
+    """Get the current stock price for a given symbol.
 
-  Args:
-    symbol (str): The stock symbol.
+    Args:
+        symbol (str): The stock symbol.
 
-  Returns:
-    float: The current stock price, or None if an error occurs.
-  """
+    Returns:
+        float: The current stock price, or None if an error occurs.
+    """
   try:
     stock = yf.Ticker(symbol)
     # Use "regularMarketPrice" for regular market hours, or "currentPrice" for pre/post market
@@ -121,27 +115,15 @@ def get_current_stock_price(symbol: str) -> float:
 
 @tool
 def get_stock_fundamentals(symbol: str) -> dict:
-    """
-    Get fundamental data for a given stock symbol using yfinance API.
+    """Get fundamental data for a given stock symbol using yfinance API.
 
     Args:
         symbol (str): The stock symbol.
 
     Returns:
-        dict: A dictionary containing fundamental data.
-            Keys:
-                - 'symbol': The stock symbol.
-                - 'company_name': The long name of the company.
-                - 'sector': The sector to which the company belongs.
-                - 'industry': The industry to which the company belongs.
-                - 'market_cap': The market capitalization of the company.
-                - 'pe_ratio': The forward price-to-earnings ratio.
-                - 'pb_ratio': The price-to-book ratio.
-                - 'dividend_yield': The dividend yield.
-                - 'eps': The trailing earnings per share.
-                - 'beta': The beta value of the stock.
-                - '52_week_high': The 52-week high price of the stock.
-                - '52_week_low': The 52-week low price of the stock.
+        dict: A dictionary containing fundamental data including symbol,
+            company_name, sector, industry, market_cap, pe_ratio, pb_ratio,
+            dividend_yield, eps, beta, 52_week_high, and 52_week_low.
     """
     try:
         stock = yf.Ticker(symbol)
@@ -167,14 +149,14 @@ def get_stock_fundamentals(symbol: str) -> dict:
 
 @tool
 def get_financial_statements(symbol: str) -> dict:
-    """
-    Get financial statements for a given stock symbol.
+    """Get financial statements for a given stock symbol.
 
     Args:
-    symbol (str): The stock symbol.
+        symbol (str): The stock symbol.
 
     Returns:
-    dict: Dictionary containing financial statements (income statement, balance sheet, cash flow statement).
+        dict: Dictionary containing financial statements including income
+            statement, balance sheet, and cash flow statement.
     """
     try:
         stock = yf.Ticker(symbol)
@@ -186,14 +168,13 @@ def get_financial_statements(symbol: str) -> dict:
 
 @tool
 def get_key_financial_ratios(symbol: str) -> dict:
-    """
-    Get key financial ratios for a given stock symbol.
+    """Get key financial ratios for a given stock symbol.
 
     Args:
-    symbol (str): The stock symbol.
+        symbol (str): The stock symbol.
 
     Returns:
-    dict: Dictionary containing key financial ratios.
+        dict: Dictionary containing key financial ratios.
     """
     try:
         stock = yf.Ticker(symbol)
@@ -205,14 +186,13 @@ def get_key_financial_ratios(symbol: str) -> dict:
 
 @tool
 def get_analyst_recommendations(symbol: str) -> pd.DataFrame:
-    """
-    Get analyst recommendations for a given stock symbol.
+    """Get analyst recommendations for a given stock symbol.
 
     Args:
-    symbol (str): The stock symbol.
+        symbol (str): The stock symbol.
 
     Returns:
-    pd.DataFrame: DataFrame containing analyst recommendations.
+        pd.DataFrame: DataFrame containing analyst recommendations.
     """
     try:
         stock = yf.Ticker(symbol)
@@ -224,14 +204,13 @@ def get_analyst_recommendations(symbol: str) -> pd.DataFrame:
 
 @tool
 def get_dividend_data(symbol: str) -> pd.DataFrame:
-    """
-    Get dividend data for a given stock symbol.
+    """Get dividend data for a given stock symbol.
 
     Args:
-    symbol (str): The stock symbol.
+        symbol (str): The stock symbol.
 
     Returns:
-    pd.DataFrame: DataFrame containing dividend data.
+        pd.DataFrame: DataFrame containing dividend data.
     """
     try:
         stock = yf.Ticker(symbol)
@@ -243,14 +222,13 @@ def get_dividend_data(symbol: str) -> pd.DataFrame:
 
 @tool
 def get_company_news(symbol: str) -> pd.DataFrame:
-    """
-    Get company news and press releases for a given stock symbol.
+    """Get company news and press releases for a given stock symbol.
 
     Args:
-    symbol (str): The stock symbol.
+        symbol (str): The stock symbol.
 
     Returns:
-    pd.DataFrame: DataFrame containing company news and press releases.
+        pd.DataFrame: DataFrame containing company news and press releases.
     """
     try:
         news = yf.Ticker(symbol).news
@@ -261,14 +239,13 @@ def get_company_news(symbol: str) -> pd.DataFrame:
 
 @tool
 def get_technical_indicators(symbol: str) -> pd.DataFrame:
-    """
-    Get technical indicators for a given stock symbol.
+    """Get technical indicators for a given stock symbol.
 
     Args:
-    symbol (str): The stock symbol.
+        symbol (str): The stock symbol.
 
     Returns:
-    pd.DataFrame: DataFrame containing technical indicators.
+        pd.DataFrame: DataFrame containing technical indicators.
     """
     try:
         indicators = yf.Ticker(symbol).history(period="max")
@@ -279,14 +256,13 @@ def get_technical_indicators(symbol: str) -> pd.DataFrame:
 
 @tool
 def get_company_profile(symbol: str) -> dict:
-    """
-    Get company profile and overview for a given stock symbol.
+    """Get company profile and overview for a given stock symbol.
 
     Args:
-    symbol (str): The stock symbol.
+        symbol (str): The stock symbol.
 
     Returns:
-    dict: Dictionary containing company profile and overview.
+        dict: Dictionary containing company profile and overview.
     """
     try:
         profile = yf.Ticker(symbol).info

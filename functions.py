@@ -296,7 +296,7 @@ def get_company_profile(symbol: str) -> dict:
         return {}
 
 def get_openai_tools() -> List[dict]:
-    functions = [
+    old_functions = [
         code_interpreter,
         google_search_and_scrape,
         get_current_stock_price,
@@ -309,6 +309,16 @@ def get_openai_tools() -> List[dict]:
         get_dividend_data,
         get_technical_indicators
     ]
+    ### Should be the same as above
+    functions = [func for func in dir(__main__) if inspect.isfunction(getattr(__main__, func)) and getattr(__main__, func).__module__ == '__main__']
+    
+    try:
+        assert ( set(functions) == set(old_functions) )
+    except Exception as e:
+        print(f"Error building automatic `functions` array: {e}")
+        print(f"It's likely that the function you added is either in a sub-module or has amother issue")
+        functions = old_functions
+        pass
 
     tools = [convert_to_openai_tool(f) for f in functions]
     return tools

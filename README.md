@@ -65,7 +65,7 @@ def get_new_function(symbol: str) -> dict:
         return {}
 ```
 
-After defining your new function, make sure to add it to the `get_openai_tools()` function in the `functions.py` script:
+After defining your new function, make sure it's added to the `functions` array in the `get_openai_tools()` function in the `functions.py` script.
 
 ```python
 def get_openai_tools() -> List[dict]:
@@ -77,6 +77,7 @@ def get_openai_tools() -> List[dict]:
     tools = [convert_to_openai_tool(f) for f in functions]
     return tools
 ```
+Note, this should be automatic via some `inspect` syntax but it's worth checking that `old_funtions` and the automatically derived `functions` arrays are the same.
 
 This will ensure that your new function is included in the list of available tools for the model to use.
 

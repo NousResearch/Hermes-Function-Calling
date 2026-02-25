@@ -19,6 +19,10 @@ from utils import (
     get_chat_template,
     validate_and_extract_tool_calls
 )
+from tool_runtime import (
+    format_tool_result,
+    invoke_tool,
+)
 
 class ModelInference:
     def __init__(self, model_path, chat_template, load_in_4bit):
@@ -77,9 +81,9 @@ class ModelInference:
         function_args = tool_call.get("arguments", {})
 
         inference_logger.info(f"Invoking function call {function_name} ...")
-        function_response = function_to_call(*function_args.values())
-        results_dict = f'{{"name": "{function_name}", "content": {function_response}}}'
-        return results_dict
+        function_response = invoke_tool(function_to_call, function_name, function_args)
+        result_json = format_tool_result(function_name, function_response)
+        return result_json
     
     def run_inference(self, prompt):
         inputs = self.tokenizer.apply_chat_template(

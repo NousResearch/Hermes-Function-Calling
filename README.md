@@ -268,7 +268,7 @@ This information provides a snapshot of Tesla's financial position and performan
 ## Prompt Format for JSON Mode / Structured Outputs
 Our model was also trained on a specific system prompt for Structured Outputs, which should respond with only a json object response, in a specific json schema.
 
-Your schema can be made from a pydantic object using our codebase, with the standalone script jsonmode.py available here: https://github.com/NousResearch/Hermes-Function-Calling/tree/main
+Your schema can be made from a pydantic object using our codebase, with the standalone script jsonmode.py available here: https://github.com/NousResearch/Hermes-Function-Calling/blob/main/jsonmode.py
 ```
 <|im_start|>system
 You are a helpful assistant that answers in JSON. Here's the json schema you must adhere to:\n<schema>\n{schema}\n</schema><|im_end|>

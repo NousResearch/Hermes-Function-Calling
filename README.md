@@ -274,3 +274,53 @@ Your schema can be made from a pydantic object using our codebase, with the stan
 You are a helpful assistant that answers in JSON. Here's the json schema you must adhere to:\n<schema>\n{schema}\n</schema><|im_end|>
 ```
 Given the {schema} that you provide, it should follow the format of that json to create it's response, all you have to do is give a typical user prompt, and it will respond in JSON.
+
+## Citation
+
+If you use this model in your research or applications, please cite:
+
+```bibtex
+@misc{NousResearch_Hermes_Function_Calling,
+  author = {NousResearch},
+  title = {Hermes-Function-Calling},
+  year = {2024},
+  url = {https://github.com/NousResearch/Hermes-Function-Calling}
+}
+```
+
+## Limitations and Risks
+
+- **Model Hallucinations**: As with all large language models, Hermes 2 Pro may occasionally generate incorrect or fabricated information. Always verify critical data, especially financial information, before making decisions.
+- **Function Calling Accuracy**: The model may sometimes fail to call the correct function or provide incorrect arguments. Implement proper error handling and validation in your applications.
+- **Financial Data**: The stock and financial data retrieved through the example functions is sourced from third-party APIs (yfinance). This data may be delayed, incomplete, or inaccurate. Do not use this data as the sole basis for financial decisions.
+- **Security Considerations**: When deploying function calling in production, be cautious about the functions you expose to the model. Validate all inputs and outputs, and implement appropriate access controls.
+- **Bias and Fairness**: Like all AI models, Hermes 2 Pro may exhibit biases present in its training data. Users should be aware of potential biases in generated outputs.
+- **Resource Requirements**: Running the model requires significant computational resources, including GPU memory. Ensure your hardware meets the minimum requirements.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+```
+MIT License
+
+Copyright (c) 2024 Nous Research
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```

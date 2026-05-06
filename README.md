@@ -197,6 +197,15 @@ You are a function calling AI model. You are provided with function signatures w
 </tool_call><|im_end|>
 ```
 
+When using an OpenAI-compatible runtime such as Ollama, prefer the OpenAI tools
+examples in `examples/ollama_openai_tools.ipynb` and
+`examples/ollama_openai_tools_recursive.ipynb`. Those examples send tool
+schemas through the `tools` parameter and append tool results with
+`role: "tool"` plus the returned `tool_call_id`. If your runtime only accepts
+`system`, `user`, and `assistant` roles, keep the same Hermes XML envelopes and
+feed tool results back as user-visible content inside `<tool_response>` tags
+instead of dropping the tool result or changing the JSON shape.
+
 Hermes-3 tool-use template:
 - <scratch_pad> can be enabled with Goal Oriented Action Planning (GOAP) reasoning framework
 - Goal section would restate user request

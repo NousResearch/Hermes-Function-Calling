@@ -101,23 +101,23 @@ def google_search_and_scrape(query: str) -> dict:
 
 @tool
 def get_current_stock_price(symbol: str) -> float:
-  """
-  Get the current stock price for a given symbol.
+    """
+    Get the current stock price for a given symbol.
 
-  Args:
-    symbol (str): The stock symbol.
+    Args:
+        symbol (str): The stock symbol.
 
-  Returns:
-    float: The current stock price, or None if an error occurs.
-  """
-  try:
-    stock = yf.Ticker(symbol)
-    # Use "regularMarketPrice" for regular market hours, or "currentPrice" for pre/post market
-    current_price = stock.info.get("regularMarketPrice", stock.info.get("currentPrice"))
-    return current_price if current_price else None
-  except Exception as e:
-    print(f"Error fetching current price for {symbol}: {e}")
-    return None
+    Returns:
+        float: The current stock price, or None if an error occurs.
+    """
+    try:
+        stock = yf.Ticker(symbol)
+        # Use "regularMarketPrice" for regular market hours, or "currentPrice" for pre/post market
+        current_price = stock.info.get("regularMarketPrice", stock.info.get("currentPrice"))
+        return current_price if current_price else None
+    except Exception as e:
+        print(f"Error fetching current price for {symbol}: {e}")
+        return None
 
 @tool
 def get_stock_fundamentals(symbol: str) -> dict:
@@ -171,10 +171,10 @@ def get_financial_statements(symbol: str) -> dict:
     Get financial statements for a given stock symbol.
 
     Args:
-    symbol (str): The stock symbol.
+        symbol (str): The stock symbol.
 
     Returns:
-    dict: Dictionary containing financial statements (income statement, balance sheet, cash flow statement).
+        dict: Dictionary containing financial statements (income statement, balance sheet, cash flow statement).
     """
     try:
         stock = yf.Ticker(symbol)
@@ -190,10 +190,10 @@ def get_key_financial_ratios(symbol: str) -> dict:
     Get key financial ratios for a given stock symbol.
 
     Args:
-    symbol (str): The stock symbol.
+        symbol (str): The stock symbol.
 
     Returns:
-    dict: Dictionary containing key financial ratios.
+        dict: Dictionary containing key financial ratios.
     """
     try:
         stock = yf.Ticker(symbol)
@@ -209,10 +209,10 @@ def get_analyst_recommendations(symbol: str) -> pd.DataFrame:
     Get analyst recommendations for a given stock symbol.
 
     Args:
-    symbol (str): The stock symbol.
+        symbol (str): The stock symbol.
 
     Returns:
-    pd.DataFrame: DataFrame containing analyst recommendations.
+        pd.DataFrame: DataFrame containing analyst recommendations.
     """
     try:
         stock = yf.Ticker(symbol)
@@ -228,10 +228,10 @@ def get_dividend_data(symbol: str) -> pd.DataFrame:
     Get dividend data for a given stock symbol.
 
     Args:
-    symbol (str): The stock symbol.
+        symbol (str): The stock symbol.
 
     Returns:
-    pd.DataFrame: DataFrame containing dividend data.
+        pd.DataFrame: DataFrame containing dividend data.
     """
     try:
         stock = yf.Ticker(symbol)
@@ -247,10 +247,10 @@ def get_company_news(symbol: str) -> pd.DataFrame:
     Get company news and press releases for a given stock symbol.
 
     Args:
-    symbol (str): The stock symbol.
+        symbol (str): The stock symbol.
 
     Returns:
-    pd.DataFrame: DataFrame containing company news and press releases.
+        pd.DataFrame: DataFrame containing company news and press releases.
     """
     try:
         news = yf.Ticker(symbol).news
@@ -265,10 +265,10 @@ def get_technical_indicators(symbol: str) -> pd.DataFrame:
     Get technical indicators for a given stock symbol.
 
     Args:
-    symbol (str): The stock symbol.
+        symbol (str): The stock symbol.
 
     Returns:
-    pd.DataFrame: DataFrame containing technical indicators.
+        pd.DataFrame: DataFrame containing technical indicators.
     """
     try:
         indicators = yf.Ticker(symbol).history(period="max")
@@ -283,10 +283,10 @@ def get_company_profile(symbol: str) -> dict:
     Get company profile and overview for a given stock symbol.
 
     Args:
-    symbol (str): The stock symbol.
+        symbol (str): The stock symbol.
 
     Returns:
-    dict: Dictionary containing company profile and overview.
+        dict: Dictionary containing company profile and overview.
     """
     try:
         profile = yf.Ticker(symbol).info

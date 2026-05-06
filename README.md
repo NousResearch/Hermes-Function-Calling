@@ -36,6 +36,22 @@ python jsonmode.py --query "Please return a json object to represent Goku from t
 - `--load_in_4bit`: Option to load in 4bit with bitsandbytes (default: "False").
 - `--query`: Query to be used for function call inference (default: "I need the current stock price of Tesla (TSLA)").
 - `--max_depth`: Maximum number of recursive iterations (default: 5).
+- `--attn_implementation`: Attention implementation passed to Transformers (default: "flash_attention_2"). Use "eager" or "sdpa" if FlashAttention is not compatible with your PyTorch/CUDA environment.
+
+### FlashAttention startup errors
+
+The example scripts default to `flash_attention_2` for faster inference. If startup fails with an error from `flash_attn` or `flash_attn_2_cuda`, the installed FlashAttention wheel usually does not match the active PyTorch/CUDA build. Reinstall FlashAttention in the current environment:
+
+```bash
+pip uninstall flash-attn
+pip install --no-build-isolation flash-attn
+```
+
+If you want to run without FlashAttention, disable it explicitly:
+
+```bash
+python functioncall.py --attn_implementation eager --query "I need the current stock price of Tesla (TSLA)"
+```
 
 ## Adding Custom Functions
 

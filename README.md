@@ -160,7 +160,7 @@ System prompts allow steerability and interesting new ways to interact with an L
 
 This is a more complex format than alpaca or sharegpt, where special tokens were added to denote the beginning and end of any turn, along with roles for the turns.
 
-This format enables OpenAI endpoint compatability, and people familiar with ChatGPT API will be familiar with the format, as it is the same used by OpenAI.
+This format enables OpenAI endpoint compatibility, and people familiar with ChatGPT API will be familiar with the format, as it is the same used by OpenAI.
 
 Prompt with system instruction (Use whatever system prompt you like, this is just an example!):
 ```

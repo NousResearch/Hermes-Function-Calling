@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+inference_logs/
+proof/frames/
+proof/narration/
+proof/segments/
+proof/work/
+proof/chrome-profile/
+proof/*.mp4
+proof/*.srt
+proof/*-check/
+*.egg-info/
+.python-version

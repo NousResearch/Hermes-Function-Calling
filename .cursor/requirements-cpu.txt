@@ -1,0 +1,25 @@
+# CPU-only dependency set for the Cloud Agent dev environment.
+#
+# This mirrors the runtime dependencies in the repo-root requirements.txt but is
+# adapted for a CPU-only machine running Python 3.12:
+#   * torch is installed separately in .cursor/install.sh from the PyTorch CPU
+#     index (the pinned torch==2.1.2 has no Python 3.12 wheels).
+#   * flash-attn and bitsandbytes are intentionally omitted — both require a
+#     CUDA GPU, which is not available here. The 8B model generation step in
+#     functioncall.py / jsonmode.py therefore needs a GPU host; every other part
+#     of the pipeline runs on CPU.
+#   * beautifulsoup4, requests and PyYAML are added explicitly: functions.py and
+#     prompter.py import them but they are missing from the root requirements.txt.
+transformers>=4.38.1
+accelerate==0.27.2
+langchain==0.1.9
+pydantic==2.6.2
+jsonschema==4.21.1
+yfinance==0.2.36
+pandas==2.2.0
+protobuf
+sentencepiece
+art
+beautifulsoup4
+requests
+PyYAML

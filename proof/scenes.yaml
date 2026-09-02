@@ -1,0 +1,57 @@
+fps: 30
+resolution:
+  width: 1280
+  height: 800
+scenes:
+  - id: title
+    kind: image
+    src: cards/title.png
+    duration: 4
+    narration: >-
+      This is Hermes Function Calling. The eight billion parameter model is
+      not on this machine. The toolkit that wraps it is, and that is what we
+      are about to run for real.
+
+  - id: tools
+    kind: frames
+    src: frames/tools
+    rate: 2.0
+    narration: >-
+      functions.py turns Python callables into OpenAI tool schemas.
+      Eleven tools come back. Here is get stock fundamentals: a symbol in,
+      a typed object out.
+
+  - id: parse
+    kind: frames
+    src: frames/parse
+    rate: 2.0
+    narration: >-
+      Hermes writes function calls inside tool call XML tags. The parser
+      pulls the JSON out of that markup so the rest of the stack can run it.
+
+  - id: validate
+    kind: frames
+    src: frames/validate
+    rate: 2.0
+    narration: >-
+      The validator checks every call against those live schemas. A Tesla
+      fundamentals request with a symbol is accepted. The same call with no
+      symbol is rejected. A function that does not exist is rejected too.
+
+  - id: execute
+    kind: frames
+    src: frames/execute
+    rate: 2.0
+    narration: >-
+      Yahoo finance rate limited this machine, so we did not fake a stock
+      quote. Instead we run the other first party tool, code interpreter,
+      on real Python. Squares of one through seven, total one hundred forty.
+
+  - id: end
+    kind: image
+    src: cards/end.png
+    duration: 4.5
+    narration: >-
+      Schema conversion, XML parse, argument checks, and a live tool. That
+      is the function calling contract. The language model is a caller, not
+      the implementation.

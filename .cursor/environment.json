@@ -1,0 +1,5 @@
+{
+  "name": "Hermes-Function-Calling (CPU dev)",
+  "user": "ubuntu",
+  "install": "bash .cursor/install.sh"
+}

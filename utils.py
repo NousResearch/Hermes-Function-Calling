@@ -65,7 +65,7 @@ def get_chat_template(chat_template):
         return None
 
 def get_assistant_message(completion, chat_template, eos_token):
-    """define and match pattern to find the assistant message"""
+    """Extract the assistant output from a full chat or generated-token-only completion."""
     completion = completion.strip()
 
     if chat_template == "zephyr":
@@ -81,13 +81,13 @@ def get_assistant_message(completion, chat_template, eos_token):
     assistant_match = assistant_pattern.search(completion)
     if assistant_match:
         assistant_content = assistant_match.group(1).strip()
-        if chat_template == "vicuna":
-            eos_token = f"</s>{eos_token}"
-        return assistant_content.replace(eos_token, "")
     else:
-        assistant_content = None
-        inference_logger.info("No match found for the assistant pattern")
-        return assistant_content
+        assistant_content = completion
+        inference_logger.info("No assistant marker found; treating completion as generated assistant output")
+
+    if chat_template == "vicuna":
+        eos_token = f"</s>{eos_token}"
+    return assistant_content.replace(eos_token, "")
 
 def validate_and_extract_tool_calls(assistant_content):
     validation_result = False
@@ -156,4 +156,3 @@ def extract_json_from_markdown(text):
     else:
         print("JSON string not found in the text.")
     return None
-

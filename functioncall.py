@@ -96,7 +96,12 @@ class ModelInference:
             do_sample=True,
             eos_token_id=self.tokenizer.eos_token_id
         )
-        completion = self.tokenizer.decode(tokens[0], skip_special_tokens=False, clean_up_tokenization_space=True)
+        generated_tokens = tokens[0, inputs.shape[-1]:]
+        completion = self.tokenizer.decode(
+            generated_tokens,
+            skip_special_tokens=False,
+            clean_up_tokenization_space=True,
+        )
         return completion
 
     def generate_function_call(self, query, chat_template, num_fewshot, max_depth=5):

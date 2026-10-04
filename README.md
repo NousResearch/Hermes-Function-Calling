@@ -28,6 +28,8 @@ python jsonmode.py --query "Please return a json object to represent Goku from t
 
 ```
 
+Both inference modes decode only the tokens generated for the current response, rather than re-decoding the full prompt on every turn. This reduces CPU and memory overhead as recursive tool conversations grow.
+
 #### Command Line Arguments
 
 - `--model_path`: Path to the model folder (default: "NousResearch/Hermes-2-Pro-Llama-3-8B").

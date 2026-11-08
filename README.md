@@ -39,6 +39,8 @@ python jsonmode.py --query "Please return a json object to represent Goku from t
 
 ## Adding Custom Functions
 
+The `get_technical_indicators` tool retrieves historical price data for one year by default to avoid downloading an unnecessarily large history. Pass a Yahoo Finance period such as `"5y"` or `"max"` when a longer range is needed.
+
 To add your own functions for the model to use, you can modify the `functions.py` script. This script contains various functions that retrieve stock-related information using the `yfinance` library.
 
 Here's an example of how to add a new function:

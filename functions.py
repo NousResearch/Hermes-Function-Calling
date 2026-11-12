@@ -260,18 +260,19 @@ def get_company_news(symbol: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 @tool
-def get_technical_indicators(symbol: str) -> pd.DataFrame:
+def get_technical_indicators(symbol: str, period: str = "1y") -> pd.DataFrame:
     """
-    Get technical indicators for a given stock symbol.
+    Get historical price data for a given stock symbol over a selected period.
 
     Args:
     symbol (str): The stock symbol.
+    period (str): The history period accepted by yfinance (for example "1y" or "max").
 
     Returns:
-    pd.DataFrame: DataFrame containing technical indicators.
+    pd.DataFrame: DataFrame containing historical price data.
     """
     try:
-        indicators = yf.Ticker(symbol).history(period="max")
+        indicators = yf.Ticker(symbol).history(period=period)
         return indicators
     except Exception as e:
         print(f"Error fetching technical indicators for {symbol}: {e}")
